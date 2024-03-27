@@ -133,10 +133,8 @@ $route = new Route();
 require_once(APP_ROOT . '/connection.php');
 
  // API SERVER 
- $route->add("/api/projects","api/projects.php");
- $route->add("/api/auth","api/auth.php");
- $route->add("/api/accounting","api/accounting.php");
-
+ $route->add("/api/reserves/get","api/get-reserves.php");
+ 
  // aqui comença la lògica del sistema
  
         // Pàgines que no han de tenir header
@@ -151,10 +149,10 @@ require_once(APP_ROOT . '/connection.php');
         $route->add("/","public/index.php");
         $route->add("/inici","public/index.php");
 
-        // 02. ERP - Comptabilitat
-        $route->add("/erp","public/02_erp_comptabilitat/index.php");
-        $route->add("/erp/facturacio-clients","public/02_erp_comptabilitat/erp-invoices-customers.php");
-        $route->add("/erp/facturacio-proveedors","public/02_erp_comptabilitat/erp-invoices-supplies.php");
+        $route->add("/reserves-parking","public/reserves-parking.php");
+        $route->add("/reserves-completades","public/reserves-completades.php");
 
+        // Manejar todas las demás rutas (404)
+        $route->notFound("public/404.php");
 
 ?>
