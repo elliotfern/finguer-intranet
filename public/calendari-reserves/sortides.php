@@ -1,19 +1,23 @@
 <?php
-require_once('inc/header.php');
+global $conn;
 
-if (isset($_GET['year'])) {
-    $year_old = $_GET['year'];
-}
+$anyActual = date("Y");
+$diaActual = date("d");
+$mesActual = date("m");
 
-    echo "<h2>Calendari de sortides: any ".$year_old ."</h2>";
+echo "<div class='container'>";
+    echo "<h2>Calendari de sortides any en curs: ".$anyActual ."</h2>";
+    echo "<ul>
+    <li><h6><a href=' ".APP_WEB."/calendari/sortides/any/".$anyActual."/mes/".$mesActual."/dia/".$diaActual."'>Veure les sortides d'avui al parking</a></h6></li>
+        </ul><br>";
 
     $sql = "SELECT CAST(rc1.diaSalida AS DATE) AS mes
     FROM reserves_parking AS rc1
-    WHERE YEAR(rc1.diaSalida) = $year_old
+    WHERE YEAR(rc1.diaSalida) = YEAR(CURRENT_TIMESTAMP())
     GROUP BY MONTH(rc1.diaSalida)
     ORDER BY rc1.diaSalida ASC, rc1.horaSalida ASC";
 
-    $pdo_statement = $pdo_conn->prepare($sql);
+    $pdo_statement = $conn->prepare($sql);
     $pdo_statement->execute();
     $result = $pdo_statement->fetchAll();
     if (!empty($result)) {
@@ -23,7 +27,7 @@ if (isset($_GET['year'])) {
         <table class='table table-striped'>
         <thead class="table-dark">
             <tr>
-                <th>Mes &darr;</th>
+                <th>Mes/any &darr;</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -31,7 +35,7 @@ if (isset($_GET['year'])) {
 	    <?php
         foreach($result as $row) {
             $mes = $row['mes'];
-	        $mes2 = date("m", strtotime($mes));
+            $mes2 = date("m", strtotime($mes));
 	        $any2 = date("Y", strtotime($mes));
 
             switch ($mes2) {
@@ -60,9 +64,8 @@ if (isset($_GET['year'])) {
                 case '12':  $mes3 = "Desembre";
                                 break;
             }
-	        
                 echo "<tr>";
-                echo "<td><a href='calendari-sortides-mes.php?&month=".$mes2."&year=".$any2."'</a>".$mes3." ".$any2."</td>";
+                echo "<td><a href='".APP_WEB."/calendari/sortides/any/".$any2."/mes/".$mes2."'>".$mes3." // ".$any2."</a></td>";
                 echo "</tr>";
             }
             echo "</tbody>";
@@ -70,10 +73,6 @@ if (isset($_GET['year'])) {
             echo "</div>";
     }
 
-    echo "<ul>";
-    echo "<li><h6><a href='calendari-sortides.php'>Veure calendari de sortides reserves</h6></li>";
-    echo "</ul>";
-
-require_once('inc/footer.php');
+echo "</div>";
+require_once(APP_ROOT . '/public/inc/footer.php');
 ?>
-

@@ -1,13 +1,14 @@
 <?php
-require_once('inc/header.php');
+global $conn;
 
 $anyActual = date("Y");
 $diaActual = date("d");
 $mesActual = date("m");
 
+echo "<div class='container'>";
     echo "<h2>Calendari d'entrades any en curs: ".$anyActual ."</h2>";
     echo "<ul>
-            <li><h6><a href='calendari-entrades-dia.php?&month=".$mesActual."&year=".$anyActual."&day=".$diaActual."'>Veure les entrades d'avui al parking</a></h6></li>
+            <li><h6><a href=' ".APP_WEB."/calendari/entrades/any/".$anyActual."/mes/".$mesActual."/dia/".$diaActual."'>Veure les entrades d'avui al parking</a></h6></li>
         </ul><br>";
 
     $sql = "SELECT CAST(rc1.diaEntrada AS DATE) AS mes
@@ -16,7 +17,7 @@ $mesActual = date("m");
     GROUP BY MONTH(rc1.diaEntrada)
     ORDER BY rc1.diaEntrada ASC, rc1.horaEntrada ASC";
 
-    $pdo_statement = $pdo_conn->prepare($sql);
+    $pdo_statement = $conn->prepare($sql);
     $pdo_statement->execute();
     $result = $pdo_statement->fetchAll();
     if (!empty($result)) {
@@ -64,7 +65,7 @@ $mesActual = date("m");
                                 break;
             }
                 echo "<tr>";
-                echo "<td><a href='calendari-entrades-mes.php?&month=".$mes2."&year=".$any2."'>".$mes3." // ".$any2."</a></td>";
+                echo "<td><a href='".APP_WEB."/calendari/entrades/any/".$any2."/mes/".$mes2."'>".$mes3." // ".$any2."</a></td>";
                 echo "</tr>";
             }
             echo "</tbody>";
@@ -72,27 +73,6 @@ $mesActual = date("m");
             echo "</div>";
     }
 
-    $sql2 = "SELECT CAST(rc1.diaEntrada AS DATE) AS mes
-    FROM reserves_parking AS rc1
-    GROUP BY YEAR(rc1.diaEntrada)
-    ORDER BY rc1.diaEntrada ASC";
-
-    $pdo_statement = $pdo_conn->prepare($sql2);
-    $pdo_statement->execute();
-    $result = $pdo_statement->fetchAll();
-
-    echo "<hr>";
-    echo "<h5>Tots els anys:</h5>";
-    echo "<ul>";
-    foreach($result as $row) {
-        $mes4 = $row['mes'];
-        $any4 = date("Y", strtotime($mes4));
-        
-        echo "<li><h6><a href='calendari-entrades-any.php?&year=".$any4."'>Any: ".$any4."</h6></li>";
-
-    }
-    echo "</ul>";
-
-require_once('inc/footer.php');
+echo "</div>";
+require_once(APP_ROOT . '/public/inc/footer.php');
 ?>
-

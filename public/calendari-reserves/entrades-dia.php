@@ -1,16 +1,9 @@
 <?php
-require_once('inc/header.php');
+global $conn;
 
-if (isset($_GET['month'])) {
-      $month_old = $_GET['month'];
-    }
-    if (isset($_GET['year'])) {
-      $year_old = $_GET['year'];
-    }
-
-    if (isset($_GET['day'])) {
-        $day_old = $_GET['day'];
-    }
+$year_old = $params['any'];
+$month_old = $params['mes'];
+$day_old = $params['dia'];
 
     switch ($month_old) {
         case '01': $mes3 = "Gener";
@@ -41,7 +34,8 @@ if (isset($_GET['month'])) {
 
 $anyActual = date("Y");
 
-    echo "<h2>Calendari d'entrades:<strong> Dia ".$day_old." // ".$mes3." // ".$year_old ."</strong></h2>";
+    echo "<div class='container'>
+    <h2>Calendari d'entrades:<strong> Dia ".$day_old." // ".$mes3." // ".$year_old ."</strong></h2>";
 
     $sql = "SELECT rc1.idReserva,
     rc1.firstName AS 'clientNom',
@@ -61,17 +55,16 @@ $anyActual = date("Y");
     rc1.buscadores,
     rc1.limpieza,
     rc1.id,
-    c.nom,
-    c.cognoms,
-    c.telefon
+    c.nombre,
+    c.telefono
     FROM reserves_parking AS rc1
     left join reservas_buscadores AS b ON rc1.buscadores = b.id
-    LEFT JOIN reservas_clientes AS c ON rc1.idClient = c.id
+    LEFT JOIN usuaris AS c ON rc1.idClient = c.id
     WHERE YEAR(rc1.diaEntrada) = $year_old AND MONTH(rc1.diaEntrada) = $month_old AND DAY(rc1.diaEntrada) = $day_old
     GROUP BY rc1.idReserva
     ORDER BY rc1.diaEntrada ASC, rc1.horaEntrada ASC";
 
-    $pdo_statement = $pdo_conn->prepare($sql);
+    $pdo_statement = $conn->prepare($sql);
     $pdo_statement->execute();
     $result = $pdo_statement->fetchAll();
     if (!empty($result)) {
@@ -153,9 +146,8 @@ $anyActual = date("Y");
            $clientCognom = $row['clientCognom'];
            $telefono = $row['telefono'];
            $id = $row['id'];
-           $nom = $row['nom'];
-           $cognoms = $row['cognoms'];
-           $telefon = $row['telefon'];
+           $nom = $row['nombre'];
+           $telefon = $row['telefono'];
 
            echo "<tr>";
            echo "<td>";
@@ -169,9 +161,9 @@ $anyActual = date("Y");
            echo "<td>".$tipoReserva2."</td>";
            echo "<td>";
             if ($idReserva == 1) {
-                echo " ".$nom."  ".$cognoms." // ".$telefon." ";
+                echo " ".$nom." // ".$telefon." ";
             } else {
-                echo "".$clientNom." ".$clientCognom." // ".$telefono."";
+                echo " ".$nom." // ".$telefon." ";
             } 
             echo "</td>";
             echo "<td>";
@@ -190,47 +182,39 @@ $anyActual = date("Y");
             echo "</td>";
             echo "<td>".$modelo1." ";
             if (!empty($matricula1)) {
-                echo " // <a href='canvi-matricula.php?&id=".$id."'>".$matricula1."</a>";
+                echo $matricula1;
             } else {
-                echo "<p><a href='canvi-matricula.php?&id=".$id."' class='btn btn-secondary btn-sm' role='button' aria-pressed='true'>Afegir matrícula</a></p>";
+                echo "<p>Afegir matrícula</p>";
             }
            echo "</td>";
            echo "<td>";
            if (empty($vuelo1)) {
-               echo "<a href='afegir-vol.php?&id=".$id."' class='btn btn-secondary btn-sm' role='button' aria-pressed='true'>Afegir</a>";
+               echo "Afegir";
            } else {
-               echo "<a href='canvi-vol.php?&id=".$id."'>".$vuelo1."</a>";
+               echo $vuelo1;
            }
            echo "</td>";
            echo "<td>".$limpieza2."</td>";
            echo "<td>";
            if ($checkIn == 1) {
-               echo "<a href='fer-checkout.php?&id=".$id."' class='btn btn-secondary btn-sm' role='button' aria-pressed='true'>Check-Out</a>";    
+               echo "Check-Out";    
            } elseif ($checkIn == 5) {
-            echo "<a href='fer-checkin.php?&id=".$id."' class='btn btn-secondary btn-sm' role='button' aria-pressed='true'>Check-In</a>";  
+            echo "Check-In";  
            } else {
             echo "Reserva completada";
            }
            echo "</td>";
            echo "<td>";
            if (empty($idReserva)) {
-               echo "<a href='afegir-nota.php?&id=".$id."' class='btn btn-info btn-sm' role='button' aria-pressed='true'>Crear notes</a>";    
+               echo "Crear notes";    
            } elseif ( !empty($idReserva) && empty($notes) ) {
-               echo "<a href='afegir-nota.php?&id=".$id."' class='btn btn-info btn-sm' role='button' aria-pressed='true'>Crear notes</a>";
+               echo "Crear notes";
            } elseif (!empty($notes) ) {
-               echo "<a href='veure-nota.php?&id=".$id."' class='btn btn-danger btn-sm' role='button' aria-pressed='true'>Veure notes</a>";
+               echo $notes;
            }
 
            echo "</td>";
-           echo "<td>";
-           if (empty($idReserva)) {
-               echo "<a href='afegir-buscador.php?&id=".$id."' class='btn btn-warning btn-sm' role='button' aria-pressed='true'>Alta en buscador</a>";    
-           } elseif ( !empty($idReserva) && empty($buscadores) ) {
-               echo "<a href='afegir-buscador.php?&id=".$id."' class='btn btn-warning btn-sm' role='button' aria-pressed='true'>Alta en buscador</a>";
-           } elseif (!empty($buscadores ) ) {
-               echo "".$buscadores." <a href='modificar-buscador.php?&id.".$id."'>(modificar)</a>";
-           }
-           echo "</td>";
+           echo "<td>Alta en buscador</td>";
            echo "</tr>";
             }
             echo "</tbody>";
@@ -238,11 +222,6 @@ $anyActual = date("Y");
             echo "</div>";
     }
 
-    echo "<ul>";
-    echo "<li><h6><a href='calendari-entrades-mes.php?&month=".$month_old."&year=".$year_old."'>Veure calendari d'entrades mes: ".$mes3." // ".$year_old."</h6></li>";
-    echo "<li><h6><a href='calendari-entrades-any.php?&year=".$year_old."'>Veure calendari d'entrades reserves any: ".$year_old."</h6></li>";
-    echo "</ul>";
-
-require_once('inc/footer.php');
-?>
-
+    echo "</div>";
+    require_once(APP_ROOT . '/public/inc/footer.php');
+    ?>

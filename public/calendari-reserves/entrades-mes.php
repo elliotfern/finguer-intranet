@@ -1,12 +1,8 @@
 <?php
-require_once('inc/header.php');
+global $conn;
 
-if (isset($_GET['month'])) {
-      $month_old = $_GET['month'];
-    }
-    if (isset($_GET['year'])) {
-      $year_old = $_GET['year'];
-    }
+$year_old = $params['any'];
+$month_old = $params['mes'];
 
     switch ($month_old) {
         case '01': $mes3 = "Gener";
@@ -37,15 +33,17 @@ if (isset($_GET['month'])) {
 
 $anyActual = date("Y");
 
-    echo "<h2>Calendari de sortides: ".$mes3." // ".$year_old ."</h2>";
+    echo "<div class='container'>
+    <h2>Calendari d'entrades: ".$mes3." // ".$year_old ."</h2>";
 
-    $sql = "SELECT CAST(rc1.diaSalida AS DATE) AS mes
+    $sql = "SELECT CAST(rc1.diaEntrada AS DATE) AS mes
     FROM reserves_parking AS rc1
-    WHERE YEAR(rc1.diaSalida) = $year_old AND MONTH(rc1.diaSalida) = $month_old
-    GROUP BY DAY(rc1.diaSalida)
-    ORDER BY rc1.diaSalida ASC, rc1.horaSalida ASC";
+    left join reservas_buscadores AS b ON rc1.buscadores = b.id
+    WHERE YEAR(rc1.diaEntrada) = $year_old AND MONTH(rc1.diaEntrada) = $month_old
+    GROUP BY DAY(rc1.diaEntrada)
+    ORDER BY rc1.diaEntrada ASC, rc1.horaEntrada ASC";
 
-    $pdo_statement = $pdo_conn->prepare($sql);
+    $pdo_statement = $conn->prepare($sql);
     $pdo_statement->execute();
     $result = $pdo_statement->fetchAll();
     if (!empty($result)) {
@@ -55,7 +53,7 @@ $anyActual = date("Y");
         <table class='table table-striped'>
         <thead class="table-dark">
             <tr>
-                <th>Veure sortides per dia &darr;</th>
+                <th>Veure entrades per dia &darr;</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -68,7 +66,7 @@ $anyActual = date("Y");
 	        $any2 = date("Y", strtotime($mes));
 
                 echo "<tr>";
-                echo "<td><a href='calendari-sortides-dia.php?&day=".$dia2."&month=".$mes2."&year=".$any2."'</a>".$dia2."/".$mes2."/".$any2."</td>";
+                echo "<td><a href='".APP_WEB."/calendari/entrades/any/".$any2."/mes/".$mes2."/dia/".$dia2."'>".$dia2."/".$mes2."/".$any2."</a></td>";
                 echo "</tr>";
             }
             echo "</tbody>";
@@ -76,10 +74,7 @@ $anyActual = date("Y");
             echo "</div>";
     }
 
-    echo "<ul>";
-    echo "<li><h6><a href='calendari-sortides-any.php?&year=".$year_old."'>Veure calendari de sortides reserves any: ".$year_old."</h6></li>";
-    echo "</ul>";
 
-require_once('inc/footer.php');
-?>
-
+    echo "</div>";
+    require_once(APP_ROOT . '/public/inc/footer.php');
+    ?>

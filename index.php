@@ -195,6 +195,18 @@ require_once(APP_ROOT . '/connection.php');
         // Motor de recerca de reserves
         $route->add("/cercador-reserva","public/motor-cerca/cercador.php");
 
+        // Calendari de entrades
+        $route->add("/calendari/entrades","public/calendari-reserves/entrades.php");
+        $route->add("/calendari/entrades/any/{any}/mes/{mes}","public/calendari-reserves/entrades-mes.php");
+        $route->add("/calendari/entrades/any/{any}/mes/{mes}/dia/{dia}","public/calendari-reserves/entrades-dia.php");
+
+        // Calendari de sortides
+        $route->add("/calendari/sortides","public/calendari-reserves/sortides.php");
+        $route->add("/calendari/sortides/any/{any}/mes/{mes}","public/calendari-reserves/sortides-mes.php");
+        $route->add("/calendari/sortides/any/{any}/mes/{mes}/dia/{dia}","public/calendari-reserves/sortides-dia.php");
+
+        // Cercadors
+
         // Manejar todas las demás rutas (404)
         $route->notFound("public/404.php");
 
