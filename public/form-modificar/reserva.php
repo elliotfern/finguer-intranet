@@ -1,9 +1,11 @@
 <?php
-require_once('inc/header.php');
+global $conn;
 
-if (isset($_GET['id'])) {
-    $id_old = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
-    
+$id = $params['id'];
+
+if (is_numeric($id)) {
+    $id_old = intval($id);
+   
     if ( filter_var($id_old, FILTER_VALIDATE_INT) ) {
         $codi_resposta = 2;
 
@@ -13,7 +15,7 @@ if (isset($_GET['id'])) {
         LEFT JOIN usuaris AS u ON r.idClient = u.id
         WHERE r.id = $id_old";
 
-        $pdo_statement = $pdo_conn->prepare($sql);
+        $pdo_statement = $conn->prepare($sql);
         $pdo_statement->execute();
         $result = $pdo_statement->fetchAll();
         foreach($result as $row) {
@@ -46,11 +48,16 @@ if (isset($_GET['id'])) {
             $notes_old = $row['notes'];
             $buscadores_old = $row['buscadores'];
         }
-
+        
+        if ($fechaReserva_old !== NULL) {
+            $fecha_formateada = "<h4>Reserva efectuada el dia: " . date('d-m-Y H:i:s', strtotime($fechaReserva_old)) . "</h4>";
+        } else {
+            $fecha_formateada = "";
+        }
+        
         echo "<div class='container'>
         <h2>Modificació ID Reserva: ".$idReserva_old." </h2>";
-        $fecha_formateada = date('d-m-Y H:i:s', strtotime($fechaReserva_old));
-        echo "<h4>Reserva efectuada el dia: ".$fecha_formateada." </h4>";
+        echo $fecha_formateada;
 
             function data_input($data) {
                 $data = trim($data);
@@ -58,9 +65,7 @@ if (isset($_GET['id'])) {
                 return $data;
               }
           
-              if (isset($_POST["update"])) {
-                global $pdo_conn;
-                  
+              if (isset($_POST["update"])) {                  
                 if (empty($_POST["buscadores"])) {
                     $buscadores = data_input($_POST["buscadores"]);
                 } else {
@@ -142,10 +147,9 @@ if (isset($_GET['id'])) {
                     echo 'Controla que totes les dades siguin correctes.</div>';
                 } 
           
-                    global $pdo_conn;
                     $sql = "UPDATE reserves_parking SET buscadores=:buscadores, importe=:importe, processed=:processed, tipo=:tipo, horaEntrada=:horaEntrada, diaEntrada=:diaEntrada, horaSalida=:horaSalida, diaSalida=:diaSalida, vehiculo=:vehiculo, matricula=:matricula, vuelo=:vuelo, limpieza=:limpieza, notes=:notes
                     WHERE id=:id";
-                    $stmt = $pdo_conn->prepare($sql);
+                    $stmt = $conn->prepare($sql);
                     $stmt->bindParam(":buscadores", $buscadores, PDO::PARAM_INT);
                     $stmt->bindParam(":importe", $importe, PDO::PARAM_INT);
                     $stmt->bindParam(":processed", $processed, PDO::PARAM_INT);
@@ -169,10 +173,10 @@ if (isset($_GET['id'])) {
                     }
           
                     if ($codi_resposta == 1)  {
-                    echo '<div class="alert alert-success" role="alert"><h4 class="alert-heading"><strong>Reserva actualizada correctament.</h4></strong>';
+                    echo '<div class="alert alert-success" role="alert"><h4 class="alert-heading"><strong>Reserva actualizada correctament.</strong></h4>';
                     echo "Reserva actualizada.</div>";
                     } else { // Error > bloqueja i mostra avis
-                        echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error en la transmissió de les dades</h4></strong>';
+                        echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error en la transmissió de les dades</strong></h4>';
                         echo 'Les dades no s\'han transmès correctament.</div>';
                     }
                 }
@@ -282,7 +286,7 @@ if (isset($_GET['id'])) {
                     FROM reservas_buscadores AS b
                     ORDER BY b.nombre ASC";
 
-                    $pdo_statement = $pdo_conn->prepare($sql);
+                    $pdo_statement = $conn->prepare($sql);
                     $pdo_statement->execute();
                     $result = $pdo_statement->fetchAll();
                     foreach($result as $row) {
@@ -298,12 +302,12 @@ if (isset($_GET['id'])) {
                     echo '</div>';
         
                     echo "<div class='md-12'>";
-                    echo "<button id='update' name='update' type='submit' class='btn btn-primary'>Modificar reserva</button><a href='reserva-modificar.php'></a>
+                    echo "<button id='update' name='update' type='submit' class='btn btn-primary'>Modificar reserva</button><a href='".APP_SERVER."/reserva/modificar/reserva/".$id_old."'></a>
                     </div>";
         
                     echo "</form>";
                 } else {
-                    echo '<a href="index.php" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
+                    echo '<a href="'.APP_WEB.'/inici" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
                 }
            
         
@@ -316,6 +320,5 @@ if (isset($_GET['id'])) {
 
 echo "</div>";
 
-require_once('inc/footer.php');
+require_once(APP_ROOT . '/public/inc/footer.php');
 ?>
-

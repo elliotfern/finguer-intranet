@@ -1,9 +1,13 @@
 <?php
-require_once('inc/header.php');
+global $conn;
 
-if (isset($_GET['id'])) {
-    $id_old = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
-    
+$id = $params['id'];
+
+echo "<div class='container'>";
+
+if (is_numeric($id)) {
+    $id_old = intval($id);
+
     if ( filter_var($id_old, FILTER_VALIDATE_INT) ) {
         $codi_resposta = 2;
 
@@ -12,7 +16,7 @@ if (isset($_GET['id'])) {
         FROM reserves_parking AS r
         WHERE r.id=$id_old";
 
-        $pdo_statement = $pdo_conn->prepare($sql);
+        $pdo_statement = $conn->prepare($sql);
         $pdo_statement->execute();
         $result = $pdo_statement->fetchAll();
         foreach($result as $row) {
@@ -34,7 +38,6 @@ if (isset($_GET['id'])) {
             function data_input($data) {
                 $data = trim($data);
                 $data = stripslashes($data);
-                $data = htmlspecialchars($data);
                 return $data;
               }
           
@@ -49,14 +52,13 @@ if (isset($_GET['id'])) {
                     $emailSent = true;
           
                 } else { // Error > bloqueja i mostra avis
-                    echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error!</h4></strong>';
+                    echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error!</strong></h4>';
                     echo 'Controla que totes les dades siguin correctes.</div>';
                 } 
           
-                    global $pdo_conn;
                     $sql = "UPDATE reserves_parking SET checkOut=:checkOut, checkIn=:checkIn
                     WHERE id=:id";
-                    $stmt = $pdo_conn->prepare($sql);
+                    $stmt = $conn->prepare($sql);
                     $stmt->bindParam(":checkOut", $checkOut, PDO::PARAM_INT);
                     $stmt->bindParam(":checkIn", $checkIn, PDO::PARAM_INT);
                     $stmt->bindParam(":id", $id_old, PDO::PARAM_INT);
@@ -68,10 +70,10 @@ if (isset($_GET['id'])) {
                     }
           
                     if ($codi_resposta == 1)  {
-                    echo '<div class="alert alert-success" role="alert"><h4 class="alert-heading"><strong>Check-Out enregistrat correctament.</h4></strong>';
+                    echo '<div class="alert alert-success" role="alert"><h4 class="alert-heading"><strong>Check-Out enregistrat correctament.</strong></h4>';
                     echo "Check-Out realizat.</div>";
                     } else { // Error > bloqueja i mostra avis
-                        echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error en la transmissió de les dades</h4></strong>';
+                        echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error en la transmissió de les dades</strong></h4>';
                         echo 'Les dades no s\'han transmès correctament.</div>';
                     }
                 }
@@ -85,7 +87,7 @@ if (isset($_GET['id'])) {
                     echo "<p>Estàs segur que vols fer el CHECK-OUT d'aquesta reserva i marcar-la com a completada?</p>";
         
                     echo "<div class='md-12'>";
-                    echo "<button id='add-checkout' name='add-checkout' type='submit' class='btn btn-primary'>Fer check-Out</button><a href='fer-checkout.php'></a>
+                    echo "<button id='add-checkout' name='add-checkout' type='submit' class='btn btn-primary'>Fer check-Out</button><a href='".APP_SERVER."/reserva/fer/check-out/".$id_old."'></a>
                     </div>";
         
                     echo "</form>";
@@ -93,7 +95,7 @@ if (isset($_GET['id'])) {
                     if ($idReserva_old == 1) {
                         echo '<a href="reserves-anuals-estat-parking.php" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
                     } else {
-                        echo '<a href="index.php" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
+                        echo '<a href="'.APP_WEB.'/inici" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
                     }
                 }
            
@@ -105,6 +107,7 @@ if (isset($_GET['id'])) {
     echo "Error. No has seleccionat cap vehicle.";
 }
 
-require_once('inc/footer.php');
-?>
+echo "</div>";
 
+require_once(APP_ROOT . '/public/inc/footer.php');
+?>

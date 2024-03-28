@@ -1,8 +1,10 @@
 <?php
-require_once('inc/header.php');
+global $conn;
 
-if (isset($_GET['id'])) {
-    $id_old = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+$id = $params['id'];
+
+if (is_numeric($id)) {
+    $id_old = intval($id);
     
     if ( filter_var($id_old, FILTER_VALIDATE_INT) ) {
         $codi_resposta = 2;
@@ -12,7 +14,7 @@ if (isset($_GET['id'])) {
         FROM reserves_parking AS r
         WHERE r.id=$id_old";
 
-        $pdo_statement = $pdo_conn->prepare($sql);
+        $pdo_statement = $conn->prepare($sql);
         $pdo_statement->execute();
         $result = $pdo_statement->fetchAll();
         foreach($result as $row) {
@@ -20,12 +22,12 @@ if (isset($_GET['id'])) {
             $idReserva_old = $row['idReserva'];
         }
 
-            echo "<h2>Afegir buscador reserva número: ".$idReserva_old." </h2>";
+            echo "<div class='container'>
+            <h2>Afegir buscador reserva número: ".$idReserva_old." </h2>";
 
             function data_input($data) {
                 $data = trim($data);
                 $data = stripslashes($data);
-                $data = htmlspecialchars($data);
                 return $data;
               }
           
@@ -43,14 +45,13 @@ if (isset($_GET['id'])) {
                     $emailSent = true;
           
                 } else { // Error > bloqueja i mostra avis
-                    echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error!</h4></strong>';
+                    echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error!</strong></h4>';
                     echo 'Controla que totes les dades siguin correctes.</div>';
                 } 
           
-                    global $pdo_conn;
                     $sql = "UPDATE reserves_parking SET buscadores=:buscadores
                     WHERE id=:id";
-                    $stmt = $pdo_conn->prepare($sql);
+                    $stmt = $conn->prepare($sql);
                     $stmt->bindParam(":buscadores", $buscadores, PDO::PARAM_INT);
                     $stmt->bindParam(":id", $id_old, PDO::PARAM_INT);
                     
@@ -61,10 +62,10 @@ if (isset($_GET['id'])) {
                     }
           
                     if ($codi_resposta == 1)  {
-                    echo '<div class="alert alert-success" role="alert"><h4 class="alert-heading"><strong>Buscadores actualizat correctament.</h4></strong>';
+                    echo '<div class="alert alert-success" role="alert"><h4 class="alert-heading"><strong>Buscadores actualizat correctament.</strong></h4>';
                     echo "Buscadors actualizat.</div>";
                     } else { // Error > bloqueja i mostra avis
-                        echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error en la transmissió de les dades</h4></strong>';
+                        echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error en la transmissió de les dades</strong></h4>';
                         echo 'Les dades no s\'han transmès correctament.</div>';
                     }
                 }
@@ -82,7 +83,7 @@ if (isset($_GET['id'])) {
                     FROM reservas_buscadores AS b
                     ORDER BY b.nombre ASC";
 
-                    $pdo_statement = $pdo_conn->prepare($sql);
+                    $pdo_statement = $conn->prepare($sql);
                     $pdo_statement->execute();
                     $result = $pdo_statement->fetchAll();
                     foreach($result as $row) {
@@ -94,12 +95,12 @@ if (isset($_GET['id'])) {
                     echo '</div>';
         
                     echo "<div class='md-12'>";
-                    echo "<button id='update-buscadores' name='update-buscadores' type='submit' class='btn btn-primary'>Alta buscador</button><a href='modificar-buscador.php'></a>
+                    echo "<button id='update-buscadores' name='update-buscadores' type='submit' class='btn btn-primary'>Alta buscador</button><a href='".APP_SERVER."/reserva/modificar/cercador/".$id_old."'></a>
                     </div>";
         
                     echo "</form>";
                 } else {
-                    echo '<a href="index.php" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
+                    echo '<a href="'.APP_WEB.'/inici" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
                 }
            
         
@@ -110,6 +111,7 @@ if (isset($_GET['id'])) {
     echo "Error. No has seleccionat cap vehicle.";
 }
 
-require_once('inc/footer.php');
-?>
+echo "</div>";
 
+require_once(APP_ROOT . '/public/inc/footer.php');
+?>

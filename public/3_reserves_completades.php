@@ -7,6 +7,8 @@
 <thead class="table-dark">
     <tr>
         <th>Núm. Comanda // ID</th>
+        <th>Data reserva</th>
+        <th>Import</th>
         <th>Tipus</th>
         <th>Client // tel.</th>
         <th>Factura</th>
@@ -27,11 +29,27 @@ function fetch_data(){
         url:urlAjax,
         method:"GET",
         dataType:"json",
-        success:function(data){
+        success:function(data) {
+            // formato fechas
+            let opcionesFormato = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            let opcionesFormato2 = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            let opcionesFormato3 = { year: 'numeric' };
+
             let html = '';
             for (let i=0; i<data.length; i++) {
                 // Operaciones de manipulacion de las variables
+                // a) Fecha reserva
 
+                let fechaReserva_formateada; // Declaración fuera del bloque if
+
+                if (data[i].fechaReserva !== null) {
+                    let fechaReservaString = data[i].fechaReserva;
+                    let fechaReservaDate = new Date(fechaReservaString);
+                    fechaReserva_formateada = fechaReservaDate.toLocaleDateString('es-ES', opcionesFormato);
+                } else {
+                    fechaReserva_formateada = "-";
+                }
+                
                 let tipo = data[i].tipo;
                 let tipoReserva2 = "";
                 if (tipo === 1) {
@@ -52,20 +70,39 @@ function fetch_data(){
                 }
                 html += '</td>';
 
+                // 2 -  Data reserva
+                 html += '<td>';
+                if (data[i].idReserva == 1) {
+                    html += '<button type="button" class="btn btn-primary btn-sm">Client anual</button>';
+                } else {
+                    html += fechaReserva_formateada; 
+                }
+                html += '</td>';
+
+                // 3 -  Import
+                html += '<td>';               
+                if (data[i].importe !== "") {
+                    html += '<strong>' + data[i].importe + ' €</strong>';
+                } else {
+                    html += '-';
+                }
+                
+                html += '</td>';
+
                 // 4 - Tipus de reserva
-                html += '<td><a href="canvi-tipus-reserva.php?&id=' + data[i].id + '"><strong>' + tipoReserva2 + '</a></strong></td>';
+                html += '<td><strong>' + tipoReserva2 + '</strong></td>';
 
                 // 6 - Client i telefon
                 html += '<td>';
                 if (data[i].nombre) {
-                    html += '<a href="canvi-client-telefon_nou.php?&id=' + data[i].id + '">' + data[i].nombre + ' // ' + data[i].tel + '</a>';
+                    html +=  data[i].nombre + ' // ' + data[i].tel;
                 } else {
-                    html += '<a href="canvi-nom-client.php?&id=' + data[i].id + '">' + data[i].clientNom + ' ' + data[i].clientCognom + '</a> // <a href="canvi-client-telefon.php?&id=' + data[i].id + '">' + data[i].telefono + '</a>';
+                    html += data[i].clientNom + ' ' + data[i].clientCognom + '// ' + data[i].telefono;
                 }
                 html += '</td>';
                
                 // 15 - Enviar factura pdf
-                html += '<td><a href="reserva-enviar-factura-pdf.php?&id=' + data[i].id + '" class="btn btn-primary btn-sm" role="button" aria-pressed="true">PDF</a></td>';
+                html += '<td><a href="' + window.location.origin + '/reserva/email/factura/' + data[i].id + '" class="btn btn-primary btn-sm" role="button" aria-pressed="true">PDF</a></td>';
 
                 html += '</tr>';
             }

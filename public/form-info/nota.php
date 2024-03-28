@@ -1,18 +1,22 @@
 <?php
-require_once('inc/header.php');
+global $conn;
 
-if (isset($_GET['id'])) {
-    $id_old = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+$id = $params['id'];
+
+if (is_numeric($id)) {
+    $id_old = intval($id);
     
     if ( filter_var($id_old, FILTER_VALIDATE_INT) ) {
         $codi_resposta = 2;
+
+        echo "<div class='container'>";
 
         // consulta general reserves 
         $sql = "SELECT r.idReserva, r.notes
         FROM reserves_parking AS r
         WHERE r.id = $id_old";
 
-        $pdo_statement = $pdo_conn->prepare($sql);
+        $pdo_statement = $conn->prepare($sql);
         $pdo_statement->execute();
         $result = $pdo_statement->fetchAll();
         foreach ($result as $row) {
@@ -27,7 +31,7 @@ if (isset($_GET['id'])) {
         }          
 
             echo "<p>".$notes_old."</p>";
-            echo "<p><a href='modificar-nota.php?&id=".$id_old."'>Vols modificar aquesta nota?</a></p>";
+            echo "<p><a href='".APP_WEB."/reserva/modificar/nota/".$id_old."'>Vols modificar aquesta nota?</a></p>";
            
         
     } else {
@@ -37,6 +41,7 @@ if (isset($_GET['id'])) {
     echo "Error. No has seleccionat cap vehicle.";
 }
 
-require_once('inc/footer.php');
-?>
+echo "</div>";
 
+require_once(APP_ROOT . '/public/inc/footer.php');
+?>

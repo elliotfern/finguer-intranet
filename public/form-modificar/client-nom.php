@@ -1,5 +1,7 @@
 <?php
-require_once('inc/header.php');
+global $conn;
+
+$id = $params['id'];
 
 /*
 AQUESTA PÀGINA SERVEIX PER MODIFICAR EL NOM DEL CLIENT
@@ -7,50 +9,42 @@ UPDATE A LA TAULA: reserves_parking
 COLUMNA: firstName, lastName
 */
 
-if (isset($_GET['id'])) {
-    $id_old = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+if (is_numeric($id)) {
+    $id_old =  intval($id);
     
     if ( filter_var($id_old, FILTER_VALIDATE_INT) ) {
         $codi_resposta = 2;
 
         // consulta general reserves 
-        $sql = "SELECT r.idReserva, r.firstName, r.lastName
+        $sql = "SELECT r.idReserva, u.nombre
         FROM reserves_parking AS r
+        LEFT JOIN usuaris AS u ON r.idClient = u.id
         WHERE r.id = $id_old";
 
-        $pdo_statement = $pdo_conn->prepare($sql);
+        $pdo_statement = $conn->prepare($sql);
         $pdo_statement->execute();
         $result = $pdo_statement->fetchAll();
         foreach($result as $row) {
             $idReserva_old = $row['idReserva'];
-            $firstName_old = $row['firstName'];
-            $lastName_old = $row['lastName'];
+            $nombre_old = $row['nombre'];
         }
-            echo "<h2>Canvi nom del client</h2>";
-            echo "<h3>Client: ".$firstName_old." ".$lastName_old." </h3>";
+            echo "<div class='container'>
+            <h2>Canvi nom del client</h2>";
+            echo "<h3>Client: ".$nombre_old." </h3>";
 
             function data_input($data) {
                 $data = trim($data);
                 $data = stripslashes($data);
-                $data = htmlspecialchars($data);
                 return $data;
               }
           
               if (isset($_POST["update-client"])) {
-                global $pdo_conn;
           
-                  if (empty($_POST["firstName"])) {
-                    $firstName = data_input($_POST["firstName"], ENT_NOQUOTES);
+                  if (empty($_POST["nombre"])) {
+                    $nombre = data_input($_POST["nombre"], ENT_NOQUOTES);
                   } else {
-                    $firstName = data_input($_POST["firstName"], ENT_NOQUOTES);
+                    $nombre = data_input($_POST["nombre"], ENT_NOQUOTES);
                   }
-
-                  if (empty($_POST["lastName"])) {
-                    $lastName = data_input($_POST["lastName"], ENT_NOQUOTES);
-                  } else {
-                    $lastName = data_input($_POST["lastName"], ENT_NOQUOTES);
-                  }
-          
                // Si no hi ha cap error, envia el formulari
                 if (!isset($hasError)) {
                     $emailSent = true;
@@ -59,13 +53,11 @@ if (isset($_GET['id'])) {
                     echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error!</h4></strong>';
                     echo 'Controla que totes les dades siguin correctes.</div>';
                 } 
-          
-                    global $pdo_conn;
-                    $sql = "UPDATE reserves_parking SET lastName=:lastName, firstName=:firstName
+
+                    $sql = "UPDATE usuaris SET nombre=:nombre
                     WHERE id=:id";
                     $stmt = $pdo_conn->prepare($sql);
-                    $stmt->bindParam(":firstName", $firstName, PDO::PARAM_STR);
-                    $stmt->bindParam(":lastName", $lastName, PDO::PARAM_STR);
+                    $stmt->bindParam(":nombre", $nombre, PDO::PARAM_STR);
                     $stmt->bindParam(":id", $id_old, PDO::PARAM_INT);
                     
                     if ($stmt->execute()) {
@@ -109,21 +101,16 @@ if (isset($_GET['id'])) {
 
                     echo '<div class="col-md-4">';
                     echo '<label>Nom client:</label>';
-                    echo '<input type="text" class="form-control" id="firstName" name="firstName" value="'.$firstName_old.'">';
+                    echo '<input type="text" class="form-control" id="nombre" name="nombre" value="'.$nombre_old.'">';
                     echo '</div>';
-                    
-                    echo '<div class="col-md-4">';
-                    echo '<label>Cognoms client:</label>';
-                    echo '<input type="text" class="form-control" id="lastName" name="lastName" value="'.$lastName_old.'">';
-                    echo '</div>';
-        
+                           
                     echo "<div class='md-12'>";
-                    echo "<button id='update-client' name='update-client' type='submit' class='btn btn-primary'>Actualizar</button><a href='canvi-nom-client.php'></a>
+                    echo "<button id='update-client' name='update-client' type='submit' class='btn btn-primary'>Actualizar</button><a href='".APP_SERVER."/reserva/modificar/nom/".$id_old."''></a>
                     </div>";
         
                     echo "</form>";
                 } else {
-                    echo '<a href="index.php" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
+                    echo '<a href="'.APP_WEB.'/inici" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
                 }
            
         
@@ -134,6 +121,8 @@ if (isset($_GET['id'])) {
     echo "Error. No has seleccionat cap reserva.";
 }
 
-require_once('inc/footer.php');
+echo "</div>";
+
+require_once(APP_ROOT . '/public/inc/footer.php');
 ?>
 

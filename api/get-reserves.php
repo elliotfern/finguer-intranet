@@ -1,5 +1,4 @@
 <?php
-
 global $conn;
 
 // 1) Llistat reserves
@@ -118,14 +117,10 @@ if (isset($_GET['type']) && $_GET['type'] == 'pendents' ) {
     rc1.fechaReserva,
     rc1.firstName AS 'clientNom',
     rc1.lastName AS 'clientCognom',
-    rc1.tel AS 'telefono',
     rc1.tipo,
-    rc1.limpieza,
     rc1.id,
     rc1.importe,
-    rc1.processed,
-    c.nombre,
-    c.telefono AS tel
+    c.nombre
     FROM reserves_parking AS rc1
     left join reservas_buscadores AS b ON rc1.buscadores = b.id
     LEFT JOIN usuaris AS c ON rc1.idClient = c.id

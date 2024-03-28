@@ -1,14 +1,10 @@
 <?php
-require_once('inc/header.php');
+global $conn;
 
-/*
-AQUESTA PÀGINA SERVEIX PER MODIFICAR EL TELEFON DEL CLIENT
-UPDATE A LA TAULA: reserves_parking
-COLUMNA: tel
-*/
+$id = $params['id'];
 
-if (isset($_GET['id'])) {
-    $id_old = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+if (is_numeric($id)) {
+    $id_old = intval($id);
     
     if ( filter_var($id_old, FILTER_VALIDATE_INT) ) {
         $codi_resposta = 2;
@@ -19,7 +15,7 @@ if (isset($_GET['id'])) {
         LEFT JOIN usuaris AS u ON r.idClient = u.id
         WHERE r.id = $id_old";
 
-        $pdo_statement = $pdo_conn->prepare($sql);
+        $pdo_statement = $conn->prepare($sql);
         $pdo_statement->execute();
         $result = $pdo_statement->fetchAll();
         foreach($result as $row) {
@@ -27,19 +23,17 @@ if (isset($_GET['id'])) {
             $firstName_old = $row['nombre'];
             $idClient = $row['idClient'];
         }
-            echo "<h2>Canvi telèfon del client</h2>";
+            echo "<div class='container'>
+            <h2>Canvi telèfon del client</h2>";
             echo "<h3>Client: ".$firstName_old." </h3>";
 
             function data_input($data) {
                 $data = trim($data);
                 $data = stripslashes($data);
-                $data = htmlspecialchars($data);
                 return $data;
               }
           
               if (isset($_POST["update-tel"])) {
-                global $pdo_conn;
-          
                   if (empty($_POST["tel"])) {
                     $tel = data_input($_POST["tel"], ENT_NOQUOTES);
                   } else {
@@ -58,7 +52,7 @@ if (isset($_GET['id'])) {
                     global $pdo_conn;
                     $sql = "UPDATE usuaris SET telefono=:telefono
                     WHERE id=:id";
-                    $stmt = $pdo_conn->prepare($sql);
+                    $stmt = $conn->prepare($sql);
                     $stmt->bindParam(":telefono", $tel, PDO::PARAM_STR);
                     $stmt->bindParam(":id", $idClient, PDO::PARAM_INT);
                     
@@ -95,12 +89,12 @@ if (isset($_GET['id'])) {
                     echo '</div>';
                         
                     echo "<div class='md-12'>";
-                    echo "<button id='update-tel' name='update-tel' type='submit' class='btn btn-primary'>Actualizar</button><a href='canvi-client-telefon.php'></a>
+                    echo "<button id='update-tel' name='update-tel' type='submit' class='btn btn-primary'>Actualizar</button><a href='".APP_SERVER."/reserva/modificar/telefon/".$id_old."'></a>
                     </div>";
         
                     echo "</form>";
                 } else {
-                    echo '<a href="index.php" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
+                    echo '<a href="'.APP_WEB.'/inici" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
                 }
            
         
@@ -111,6 +105,7 @@ if (isset($_GET['id'])) {
     echo "Error. No has seleccionat cap reserva.";
 }
 
-require_once('inc/footer.php');
-?>
+echo "</div>";
 
+require_once(APP_ROOT . '/public/inc/footer.php');
+?>

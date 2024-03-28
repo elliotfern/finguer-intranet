@@ -104,15 +104,22 @@ function fetch_data(){
 
                 // 3 - Pagat
                 html += '<td>';
-                if (data[i].processed === 1) {
+                if (data[i].idReserva == 1) {
                     html += '<button type="button" class="btn btn-success">SI</button>';
+                    html += '<p>Client anual</p>';
                 } else {
-                    html += '<button type="button" class="btn btn-danger">NO</button>';
-                }
+                    if (data[i].processed === 1) {
+                    html += '<button type="button" class="btn btn-success">SI</button>';
+                    html += '<p><a href="' + window.location.origin + '/reserva/verificar-pagament/' + data[i].id + '"><strong>Verificar pagament</a></p>';
+                    } else {
+                        html += '<button type="button" class="btn btn-danger">NO</button>';
+                        html += '<p><a href="' + window.location.origin + '/reserva/verificar-pagament/' + data[i].id + '"><strong>Verificar pagament</a></p>';
+                    }
+                }     
                 html += '</td>';
 
                 // 4 - Tipus de reserva
-                html += '<td><a href="canvi-tipus-reserva.php?&id=' + data[i].id + '"><strong>' + tipoReserva2 + '</a></strong></td>';
+                html += '<td><a href="' + window.location.origin + '/reserva/modificar/tipus/' + data[i].id + '"><strong>' + tipoReserva2 + '</a></strong></td>';
 
                 // 5 - Neteja
                 html += '<td>' + limpieza2 + '</td>';
@@ -120,9 +127,9 @@ function fetch_data(){
                 // 6 - Client i telefon
                 html += '<td>';
                 if (data[i].nombre) {
-                    html += '<a href="canvi-client-telefon_nou.php?&id=' + data[i].id + '">' + data[i].nombre + ' // ' + data[i].tel + '</a>';
+                    html += '<a href="' + window.location.origin + '/reserva/modificar/nom/' + data[i].id + '">' + data[i].nombre + '</a> // <a href="' + window.location.origin + '/reserva/modificar/telefon/' + data[i].id + '">' + data[i].tel + '</a>';
                 } else {
-                    html += '<a href="canvi-nom-client.php?&id=' + data[i].id + '">' + data[i].clientNom + ' ' + data[i].clientCognom + '</a> // <a href="canvi-client-telefon.php?&id=' + data[i].id + '">' + data[i].telefono + '</a>';
+                    html += data[i].clientNom + ' ' + data[i].clientCognom + ' // ' + data[i].telefono + '</a>';
                 }
                 html += '</td>';
 
@@ -131,7 +138,7 @@ function fetch_data(){
                 if (dataEntradaAny == 1970) {
                     tml += 'Pendent';
                 } else {
-                    html += '<strong><a href="canvi-reserva-entrada.php?&id=' + data[i].id + '">' + dataEntrada2 + '</a> // <a href="canvi-reserva-entrada.php?&id=' + data[i].id + '">' + data[i].HoraEntrada + '</a></strong>';
+                    html += '<strong><a href="' + window.location.origin + '/reserva/modificar/entrada/' + data[i].id + '">' + dataEntrada2 + '//' + data[i].HoraEntrada + '</a></strong>';
                 }
                 html += '</td>';
 
@@ -140,72 +147,72 @@ function fetch_data(){
                 if (dataSortidaAny == 1970) {
                     html += 'Pendent';
                 } else {
-                    html += '<a href="canvi-reserva-sortida.php?&id=' + data[i].id + '">' + dataSortida2 + '</a> // <a href="canvi-reserva-sortida.php?&id=' + data[i].id + '">' + data[i].HoraSortida + '</a>';
+                    html += '<a href="' + window.location.origin + '/reserva/modificar/sortida/' + data[i].id + '">' + dataSortida2 + '</a> // <a href="' + window.location.origin + '/reserva/modificar/sortida/' + data[i].id + '">' + data[i].HoraSortida + '</a>';
                 }
                 html += '</td>';
 
                 // 9 - Vehicle i matricula
-                html += '<td><a href="canvi-matricula.php?&id=' + data[i].id + '">' + data[i].modelo + '</a>';
+                html += '<td><a href="' + window.location.origin + '/reserva/modificar/vehicle/' + data[i].id + '">' + data[i].modelo + '</a>';
                 if (data[i].matricula) {
-                    html += ' // <a href="canvi-matricula.php?&id=' + data[i].id + '">' + data[i].matricula + '</a>';
+                    html += ' // <a href="' + window.location.origin + '/reserva/modificar/vehicle/' + data[i].id + '">' + data[i].matricula + '</a>';
                 } else {
-                    html += '<p><a href="canvi-matricula.php?&id=' + data[i].id + '" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Afegir matrícula</a></p>';
+                    html += '<p><a href="' + window.location.origin + '/reserva/modificar/vehicle/' + data[i].id + '" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Afegir matrícula</a></p>';
                 }
                 html += '</td>';
 
                 // 10 - Dades vol
                 html += '<td>';
                 if (!data[i].vuelo) {
-                    html += '<a href="afegir-vol.php?&id=' + data[i].id + '" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Afegir vol</a>';
+                    html += '<a href="' + window.location.origin + '/reserva/modificar/vol/' + data[i].id + '" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Afegir vol</a>';
                 } else {
-                    html += '<a href="canvi-vol.php?&id=' + data[i].id + '">' + data[i].vuelo + '</a>';
+                    html += '<a href="' + window.location.origin + '/reserva/modificar/vol/' + data[i].id + '">' + data[i].vuelo + '</a>';
                 }
                 html += '</td>';
 
                 // 11 - CheckIn
                 html += '<td>';
                 if (data[i].checkIn === 5) {
-                    html += '<a href="fer-checkin.php?&id=' + data[i].id + '" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Check-In</a>';
+                    html += '<a href="' + window.location.origin + '/reserva/fer/check-in/' + data[i].id + '" class="btn btn-secondary btn-sm" role="button" aria-pressed="true">Check-In</a>';
                 }
                 html += '</td>';
 
                 // 12 - Notes
                 html += '<td>';
                 if (!data[i].idReserva) {
-                    html += '<a href="afegir-nota.php?&id=' + data[i].id + '" class="btn btn-info btn-sm" role="button" aria-pressed="true">Crear</a>';
+                    html += '<a href="' + window.location.origin + '/reserva/modificar/nota/' + data[i].id + '" class="btn btn-info btn-sm" role="button" aria-pressed="true">Crear</a>';
                 } else if (data[i].idReserva && !data[i].notes) {
-                    html += '<a href="afegir-nota.php?&id=' + data[i].id + '" class="btn btn-info btn-sm" role="button" aria-pressed="true">Crear</a>';
+                    html += '<a href="' + window.location.origin + '/reserva/modificar/nota/' + data[i].id + '" class="btn btn-info btn-sm" role="button" aria-pressed="true">Crear</a>';
                 } else if (data[i].notes) {
-                    html += '<a href="veure-nota.php?&id=' + data[i].id + '" class="btn btn-danger btn-sm" role="button" aria-pressed="true">Veure</a>';
+                    html += '<a href="' + window.location.origin + '/reserva/info/nota/' + data[i].id + '" class="btn btn-danger btn-sm" role="button" aria-pressed="true">Veure</a>';
                 }
                 html += '</td>';
 
                 // 13 - Cercadors
                 html += '<td>';
                 if (data[i].idReserva == 1) {
-                    html += '<a href="reserves-anuals-modificar-reserva.php?&id=' + data[i].id + '" class="btn btn-dark btn-sm" role="button" aria-pressed="true">Modificar reserva</a>';
+                    html += '-';
                 } else {
                     if (!data[i].idReserva) {
-                        html += '<a href="afegir-buscador.php?&id=' + data[i].id + '" class="btn btn-warning btn-sm" role="button" aria-pressed="true">Alta</a>';
+                        html += '<a href=' + window.location.origin + '/reserva/modificar/cercador/' + data[i].id + '" class="btn btn-warning btn-sm" role="button" aria-pressed="true">Alta</a>';
                     } else if (data[i].idReserva && !data[i].buscadores) {
-                        html += '<a href="afegir-buscador.php?&id=' + data[i].id + '" class="btn btn-warning btn-sm" role="button" aria-pressed="true">Alta</a>';
+                        html += '<a href="' + window.location.origin + '/reserva/modificar/cercador/' + data[i].id + '" class="btn btn-warning btn-sm" role="button" aria-pressed="true">Alta</a>';
                     } else if (data[i].buscadores) {
-                        html += data[i].buscadores + ' <a href="modificar-buscador.php?&id=' + data[i].id + '">(modificar)</a>';
+                        html += data[i].buscadores + ' <a href="' + window.location.origin + '/reserva/modificar/cercador/' + data[i].id + '">(modificar)</a>';
                     }
                 }
                 html += '</td>';
 
                 // 14 - Email confirmacio
-                html += '<td><a href="reserva-enviar-email.php?&id=' + data[i].id + '" class="btn btn-primary btn-sm" role="button" aria-pressed="true">Enviar email</a></td>';
+                html += '<td><a href="' + window.location.origin + '/reserva/email/confirmacio/' + data[i].id + '" class="btn btn-primary btn-sm" role="button" aria-pressed="true">Enviar email</a></td>';
                 
                 // 15 - Enviar factura pdf
-                html += '<td><a href="reserva-enviar-factura-pdf.php?&id=' + data[i].id + '" class="btn btn-primary btn-sm" role="button" aria-pressed="true">PDF</a></td>';
+                html += '<td><a href="' + window.location.origin + '/reserva/email/factura/' + data[i].id + '" class="btn btn-primary btn-sm" role="button" aria-pressed="true">PDF</a></td>';
 
                 // 16 - Modificar reserva
-                html += '<td><a href="reserva-modificar.php?&id=' + data[i].id + '" class="btn btn-warning btn-sm" role="button" aria-pressed="true">Modificar</a></td>';
+                html += '<td><a href="' + window.location.origin + '/reserva/modificar/reserva/' + data[i].id + '" class="btn btn-warning btn-sm" role="button" aria-pressed="true">Modificar</a></td>';
 
                 // 17 - Eliminar reserva
-                html += '<td><a href="reserva-eliminar.php?&id=' + data[i].id + '" class="btn btn-danger btn-sm" role="button" aria-pressed="true">Eliminar</a></td>';
+                html += '<td><a href="' + window.location.origin + '/reserva/eliminar/reserva/' + data[i].id + '" class="btn btn-danger btn-sm" role="button" aria-pressed="true">Eliminar</a></td>';
 
                 html += '</tr>';
             }

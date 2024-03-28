@@ -132,25 +132,45 @@ $route = new Route();
 // Route for paths containing '/control/'
 require_once(APP_ROOT . '/connection.php');
 
- // API SERVER 
+// API SERVER 
  $route->add("/api/reserves/get","api/get-reserves.php");
  
  // aqui comença la lògica del sistema
  
         // Pàgines que no han de tenir header
-        $route->add("/accounting/invoice/pdf/{id}", "php-forms/accounting/generate_pdf.php");
-        $route->add("/accounting/invoice-customer/new","php-forms/accounting/invoice-customer-add.php");
-        $route->add("/accounting/process/invoice-customer/new","php-process/accounting/customer-invoice-insert.php");
 
         // CARREGAR HEADER
         require_once(APP_ROOT . '/public/inc/header.php');
 
         // 01. Inici
-        $route->add("/","public/index.php");
-        $route->add("/inici","public/index.php");
+        $route->add("/","public/1_reserves_pendents.php");
+        $route->add("/inici","public/1_reserves_pendents.php");
 
-        $route->add("/reserves-parking","public/reserves-parking.php");
-        $route->add("/reserves-completades","public/reserves-completades.php");
+        $route->add("/reserves-parking","public/2_reserves_parking.php");
+        $route->add("/reserves-completades","public/3_reserves_completades.php");
+
+        $route->add("/reserva/verificar-pagament/{id}","public/soap/verificar-pagament.php");
+
+        $route->add("/reserva/modificar/tipus/{id}","public/form-modificar/tipus-reserva.php");
+        $route->add("/reserva/modificar/telefon/{id}","public/form-modificar/client-telefon.php");
+        $route->add("/reserva/modificar/nom/{id}","public/form-modificar/client-nom.php");
+        $route->add("/reserva/modificar/entrada/{id}","public/form-modificar/reserva-entrada.php");
+        $route->add("/reserva/modificar/sortida/{id}","public/form-modificar/reserva-sortida.php");
+        $route->add("/reserva/modificar/vehicle/{id}","public/form-modificar/vehicle.php");
+        $route->add("/reserva/modificar/vol/{id}","public/form-modificar/vol.php");
+        $route->add("/reserva/modificar/nota/{id}","public/form-modificar/nota.php");
+        $route->add("/reserva/modificar/cercador/{id}","public/form-modificar/cercador.php");
+        $route->add("/reserva/modificar/reserva/{id}","public/form-modificar/reserva.php");
+
+        $route->add("/reserva/eliminar/reserva/{id}","public/form-eliminar/reserva.php");
+
+        $route->add("/reserva/info/nota/{id}","public/form-info/nota.php");
+
+        $route->add("/reserva/fer/check-in/{id}","public/form-modificar/checkin.php");
+        $route->add("/reserva/fer/check-out/{id}","public/form-modificar/checkout.php");
+
+        $route->add("/reserva/email/confirmacio/{id}","public/email/reserva-enviar-email.php");
+        $route->add("/reserva/email/factura/{id}","public/email/reserva-enviar-factura-pdf.php");
 
         // Manejar todas las demás rutas (404)
         $route->notFound("public/404.php");

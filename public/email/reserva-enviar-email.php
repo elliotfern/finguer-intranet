@@ -1,14 +1,7 @@
 <?php
-require_once('inc/header.php');
+global $conn;
 
-require 'vendor/autoload.php';
-
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
-$url_root = $_SERVER['DOCUMENT_ROOT'];
-define("APP_ROOT", $url_root); 
-
+$id = $params['id'];
 $email_pass = $_ENV['EMAIL_PASS'];
 
 // Incluye la clase PHPMailer
@@ -20,8 +13,9 @@ require_once(APP_ROOT . '/vendor/phpmailer/phpmailer/src/Exception.php');
 require_once(APP_ROOT . '/vendor/phpmailer/phpmailer/src/PHPMailer.php');
 require_once(APP_ROOT . '/vendor/phpmailer/phpmailer/src/SMTP.php');
 
-if (isset($_GET['id'])) {
-    $id_old = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+
+if (is_numeric($id)) {
+    $id_old = intval($id);
     
     if ( filter_var($id_old, FILTER_VALIDATE_INT) ) {
         $codi_resposta = 2;
@@ -32,7 +26,7 @@ if (isset($_GET['id'])) {
         LEFT JOIN usuaris AS u ON r.idClient = u.id
         WHERE r.id = $id_old";
 
-        $pdo_statement = $pdo_conn->prepare($sql);
+        $pdo_statement = $conn->prepare($sql);
         $pdo_statement->execute();
         $result = $pdo_statement->fetchAll();
         foreach($result as $row) {
@@ -153,9 +147,9 @@ if (isset($_GET['id'])) {
 
                 // Envía el correo electrónico
                 $mail->send();
-                echo 'El correo electrónico ha sido enviado correctamente.';
+                echo 'El correu electrònic s\'ha enviat correctament';
             } catch (Exception $e) {
-                echo "El correo electrónico no pudo ser enviado. Error: {$mail->ErrorInfo}";
+                echo "El correu electrònic no s\'ha pogut enviar. Error: {$mail->ErrorInfo}";
             }
         echo "</div>";
 
@@ -166,5 +160,7 @@ if (isset($_GET['id'])) {
     echo "Error. No has seleccionat cap vehicle.";
 }
 
-require_once('inc/footer.php');
+echo "</div>";
+
+require_once(APP_ROOT . '/public/inc/footer.php');
 ?>

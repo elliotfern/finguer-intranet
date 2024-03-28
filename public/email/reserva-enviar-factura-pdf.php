@@ -1,16 +1,9 @@
 <?php
-require_once('inc/header.php');
+global $conn;
 
-require_once('vendor/autoload.php');
-$url_server = $_SERVER['HTTP_HOST'];
-$url_root = $_SERVER['DOCUMENT_ROOT'];
+$id = $params['id'];
 
-require_once($url_root . '/vendor/tecnickcom/tcpdf/tcpdf.php');
-
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
-define("APP_ROOT", $url_root); 
+require_once(APP_ROOT . '/vendor/tecnickcom/tcpdf/tcpdf.php');
 
 // Incluye los archivos autoload de PHPMailer
 require_once(APP_ROOT . '/vendor/phpmailer/phpmailer/src/Exception.php');
@@ -23,12 +16,11 @@ $email_pass = $_ENV['EMAIL_PASS'];
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-
 // Incluye la clase TCPDF
-use \TCPDF;
+//use \TCPDF;
 
-if (isset($_GET['id'])) {
-    $id_old = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
+if (is_numeric($id)) {
+    $id_old = intval($id);
     
     if ( filter_var($id_old, FILTER_VALIDATE_INT) ) {
         $codi_resposta = 2;
@@ -49,7 +41,7 @@ if (isset($_GET['id'])) {
         LEFT JOIN usuaris AS u ON r.idClient = u.id
         WHERE r.id = $id_old";
 
-        $pdo_statement = $pdo_conn->prepare($sql);
+        $pdo_statement = $conn->prepare($sql);
         $pdo_statement->execute();
         $result = $pdo_statement->fetchAll();
         foreach($result as $row) {
@@ -253,8 +245,7 @@ if (isset($_GET['id'])) {
             // Escribir el contenido HTML en el PDF
             $pdf->writeHTML($htmlContent, true, false, true, false, '');
 
-
-            $filename = $url_root . '/pdf/documento.pdf'; // Nombre del archivo PDF generado
+            $filename = APP_ROOT . '/pdf/documento.pdf'; // Nombre del archivo PDF generado
             $pdf->Output($filename, 'F'); // Guardar el PDF en el servidor
 
             // Configurar PHPMailer
@@ -299,5 +290,7 @@ if (isset($_GET['id'])) {
     echo "Error. No has seleccionat cap vehicle.";
 }
 
-require_once('inc/footer.php');
+echo "</div>";
+
+require_once(APP_ROOT . '/public/inc/footer.php');
 ?>
