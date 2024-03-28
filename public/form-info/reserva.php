@@ -1,5 +1,4 @@
 <?php
-require_once('inc/header.php');
 
 if (isset($_GET['idReserva'])) {
     $idReserva_old = filter_input(INPUT_GET, 'idReserva', FILTER_SANITIZE_NUMBER_INT);

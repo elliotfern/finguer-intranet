@@ -112,6 +112,5 @@ if (is_numeric($id)) {
 }
 
 echo "</div>";
-
 require_once(APP_ROOT . '/public/inc/footer.php');
 ?>

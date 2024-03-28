@@ -136,7 +136,7 @@ function fetch_data(){
                 // 7 - Entrada (dia i hora)
                 html += '<td>';
                 if (dataEntradaAny == 1970) {
-                    tml += 'Pendent';
+                    html += 'Pendent';
                 } else {
                     html += '<strong><a href="' + window.location.origin + '/reserva/modificar/entrada/' + data[i].id + '">' + dataEntrada2 + '//' + data[i].HoraEntrada + '</a></strong>';
                 }

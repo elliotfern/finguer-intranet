@@ -1,11 +1,12 @@
 <?php
+global $conn;
 
-require_once('inc/header.php');
 $exit = false;
 ?>
 
+<div class="container">
 <h2>Cercador de reserves</h2>
-<h4>Cerca per cognom del client</h4>
+<h4>Cerca per número de reserva</h4>
 
 <?php
 
@@ -36,7 +37,7 @@ if (!empty($_REQUEST['term2'])) {
 echo '<form action="" method="POST" id="submit2" class="row g-3">';
 
 echo '<div class="col-md-12">';
-echo '<input type="text" name="term2" placeholder="Cognom" >';
+echo '<input type="text" name="term2" placeholder="Núm reserva" >';
 echo "</div>";
 
 echo '<div class="col-12">';
@@ -44,9 +45,6 @@ echo '<input type="submit" class="btn btn-primary" name="submit2" value="Cerca">
 echo "</div>";
 
 echo '</form>';
-
-echo '<br><br>
-<h6><a href="cercador-reserva-numero.php">Vols cercar per número de reserva?</a></h6>';
 
 if ($exit === true) {
     // consulta general reserves 
@@ -67,18 +65,17 @@ if ($exit === true) {
     rc1.notes,
     rc1.buscadores,
     rc1.limpieza,
-    c.nom,
-    c.cognoms,
-    c.telefon,
+    c.nombre,
+    c.telefono,
     rc1.id
     FROM reserves_parking AS rc1
     left join reservas_buscadores AS b ON rc1.buscadores = b.id
-    LEFT JOIN reservas_clientes AS c ON rc1.idClient = c.id
-    WHERE rc1.lastName = '".$term_net2."' OR c.cognoms = '".$term_net2."'
+    LEFT JOIN usuaris AS c ON rc1.idClient = c.id
+    WHERE rc1.idReserva='".$term_net2."'
     GROUP BY rc1.id
     ORDER BY rc1.diaSalida ASC, rc1.horaSalida  ASC";
 
-    $pdo_statement = $pdo_conn->prepare($sql);
+    $pdo_statement = $conn->prepare($sql);
     $pdo_statement->execute();
     $result = $pdo_statement->fetchAll();
     foreach($result as $row) {
@@ -86,7 +83,7 @@ if ($exit === true) {
         $notes_old = $row['notes'];
     }
     echo "<br><br>";    
-    echo "<h2>Reserves clients amb cognom: ".$term_net2." </h2>";
+    echo "<h2>Reserva número: ".$term_net2." </h2>";
         ?>
         <div class='table-responsive'>
 <table class='table table-striped'>
@@ -162,12 +159,11 @@ if(!empty($result)) {
                 $buscadores = "icarous";
             }
 
-            $clientNom = $row['clientNom'];
+           $clientNom = $row['clientNom'];
            $clientCognom = $row['clientCognom'];
            $telefono = $row['telefono'];
-           $nom = $row['nom'];
-           $cognoms = $row['cognoms'];
-           $telefon = $row['telefon'];
+           $nom = $row['nombre'];
+           $telefon = $row['telefono'];
            $id = $row['id'];
 
            echo "<tr>";
@@ -182,9 +178,13 @@ if(!empty($result)) {
            echo "<td>".$tipoReserva2."</td>";
            echo "<td>";
             if ($idReserva == 1) {
-                echo " ".$nom."  ".$cognoms." // ".$telefon." ";
+                echo " ".$nom." // ".$telefon." ";
             } else {
-                echo "".$clientNom." ".$clientCognom." // ".$telefono."";
+                if ($nom == "") {
+                    echo "".$clientNom." ".$clientCognom." // ".$telefono."";
+                } else {
+                    echo " ".$nom." // ".$telefon." ";
+                } 
             } 
             echo "</td>";
             echo "<td>";
@@ -203,48 +203,35 @@ if(!empty($result)) {
             echo "</td>";
            echo "<td>".$modelo1." ";
             if (!empty($matricula1)) {
-                echo " // <a href='canvi-matricula.php?&id=".$id."'>".$matricula1."</a>";
+                echo $matricula1;
             } else {
-                echo "<p><a href='canvi-matricula.php?&id=".$id."' class='btn btn-secondary btn-sm' role='button' aria-pressed='true'>Afegir matrícula</a></p>";
+                echo "<p>Afegir matrícula</p>";
             }
            echo "</td>";
 
            echo "<td>";
            if (empty($vuelo1)) {
-               echo "<a href='afegir-vol.php?&id=".$id."' class='btn btn-secondary btn-sm' role='button' aria-pressed='true'>Afegir vol</a>";
+               echo "Afegir vol";
            } else {
-               echo "<a href='canvi-vol.php?&id=".$id."'>".$vuelo1."</a>";
+               echo $vuelo1;
            }
            echo "</td>";
            echo "<td>".$limpieza2."</td>";
            echo "<td>";
-           if ($checkIn == 5) {
-               echo "<a href='fer-checkin.php?&id=".$id."' class='btn btn-secondary btn-sm' role='button' aria-pressed='true'>Check-In</a>";    
-           }
+            if ($checkIn == 5) {
+               echo "<a href='".APP_WEB."/reserva/fer/check-in/".$id."' class='btn btn-secondary btn-sm' role='button' aria-pressed='true'>Check-In</a>";    
+            } elseif ($checkIn == 6) {
+            echo "Reserva cancel·lada";    
+            } elseif ($checkIn == 1) {
+                echo "<a href='".APP_WEB."/reserva/fer/check-in/".$id."' class='btn btn-secondary btn-sm' role='button' aria-pressed='true'>Check-Out</a>";    
+            } elseif ($checkOut == 2) {
+                echo "Reserva completada";    
+            }
            echo "</td>";
            echo "<td>";
-           if (empty($idReserva)) {
-               echo "<a href='afegir-nota.php?&id=".$id."' class='btn btn-info btn-sm' role='button' aria-pressed='true'>Crear notes</a>";    
-           } elseif ( !empty($idReserva) && empty($notes) ) {
-               echo "<a href='afegir-nota.php?&id=".$id."' class='btn btn-info btn-sm' role='button' aria-pressed='true'>Crear notes</a>";
-           } elseif (!empty($notes) ) {
-               echo "<a href='veure-nota.php?&id=".$id."' class='btn btn-danger btn-sm' role='button' aria-pressed='true'>Veure notes</a>";
-           }
-
+            echo $notes;
            echo "</td>";
-           echo "<td>";
-           if ($idReserva == 1) {
-               echo " - ";
-           } else {
-                if (empty($idReserva)) {
-                    echo "<a href='afegir-buscador.php?&id=".$id."' class='btn btn-warning btn-sm' role='button' aria-pressed='true'>Alta en buscador</a>";    
-                } elseif ( !empty($idReserva) && empty($buscadores) ) {
-                    echo "<a href='afegir-buscador.php?&id=".$id."' class='btn btn-warning btn-sm' role='button' aria-pressed='true'>Alta en buscador</a>";
-                } elseif (!empty($buscadores ) ) {
-                    echo "".$buscadores." <a href='modificar-buscador.php?&id=".$id."'>(modificar)</a>";
-                }
-           } 
-           echo "</td>";
+           echo "<td>Alta en buscador</td>";
            echo "</tr>";
        }
        echo "</tbody>";
@@ -260,8 +247,6 @@ if(!empty($result)) {
 </div>
 
 <?php 
-require_once('inc/footer.php');
+echo "</div>";
+require_once(APP_ROOT . '/public/inc/footer.php');
 ?>
-
-
-

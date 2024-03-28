@@ -1,59 +1,33 @@
 <?php
-require_once('inc/header.php');
-require_once('inc/header-reserves-anuals.php');
 
-if (isset($_GET['id'])) {
-    $id_old = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
-    
-    if ( filter_var($id_old, FILTER_VALIDATE_INT) ) {
-        $codi_resposta = 2;
+if (isset($params['idClient'])) {
+    $idClient = $params['idClient'];
+} else {
+    $idClient = "";
+}
 
-         // consulta general reserves 
-         $sql = "SELECT rc1.diaSalida AS 'dataSortida',
-         rc1.horaEntrada AS 'HoraEntrada',
-         rc1.horaSalida AS 'HoraSortida',
-         rc1.diaEntrada AS 'dataEntrada',
-         rc1.matricula AS 'matricula',
-         rc1.vehiculo AS 'modelo',
-         rc1.vuelo AS 'vuelo',
-         rc1.tipo AS 'tipo',
-         rc1.limpieza,
-         rc1.idClient,
-         rc1.notes
-         FROM reserves_parking AS rc1
-         WHERE rc1.id = $id_old";
- 
-         $pdo_statement = $pdo_conn->prepare($sql);
-         $pdo_statement->execute();
-         $result = $pdo_statement->fetchAll();
-         foreach($result as $row) {
-            $dataSortida_old = $row['dataSortida'];
-            $HoraEntrada_old = $row['HoraEntrada'];
-            $HoraSortida_old = $row['HoraSortida'];
-            $dataEntrada_old = $row['dataEntrada'];
-            $matricula_old = $row['matricula'];
-            $modelo_old = $row['modelo'];
-            $vuelo_old = $row['vuelo'];
-            $tipo_old = $row['tipo'];
-            $limpieza_old = $row['limpieza'];
-            $idClient_old = $row['idClient'];
-            $notes_old = $row['notes'];
-         }
+global $conn;
+require_once(APP_ROOT . '/public/inc/header-reserves-anuals.php');
 
-        echo "<h3>Modificació de reserva de client amb abonament anual</h3>";
-        echo "<h4>ID reserva número: ".$id_old ."</h4>";
+echo "<div class='container'>";
 
-        function data_input($data) {
-            $data = trim($data);
-            $data = stripslashes($data);
-            $data = htmlspecialchars($data);
-            return $data;
-        }
-            
-        $codi_resposta = 2;
+if (is_numeric($idClient)) {
+    $idClient_old = intval($idClient);
+} else {
+    $idClient_old = NULL;
+}
 
-              if (isset($_POST["modifica-reserva"])) {
-                global $pdo_conn;
+echo "<h3>Creació reserva de client Abonament anual</h3>";
+
+function data_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    return $data;
+}
+	
+$codi_resposta = 2;
+
+              if (isset($_POST["alta-reserva"])) {
                   
                 if (empty($_POST["idClient"])) {
                     $hasError = true;
@@ -115,7 +89,11 @@ if (isset($_GET['id'])) {
                     $matricula = data_input($_POST["matricula"], ENT_NOQUOTES);
                 }
 
+                $idReserva = 0001;
                 $neteja = NULL;
+                $checkIn = 5;
+                $checkOut = NULL;
+                $fechaReserva = date("Y-m-d H:i:s");
 
                // Si no hi ha cap error, envia el formulari
                 if (!isset($hasError)) {
@@ -126,11 +104,10 @@ if (isset($_GET['id'])) {
                     echo 'Controla que totes les dades siguin correctes.</div>';
                 } 
 
-                    global $pdo_conn;
-                    $sql = "UPDATE reserves_parking SET idClient=:idClient, diaEntrada=:diaEntrada, horaEntrada=:horaEntrada, diaSalida=:diaSalida, horaSalida=:horaSalida, vuelo=:vuelo, notes=:notes, tipo=:tipo, matricula=:matricula, vehiculo=:vehiculo
-                    WHERE id=:id";
-                    $stmt = $pdo_conn->prepare($sql);
+                    $sql = "INSERT INTO reserves_parking SET idClient=:idClient, idReserva=:idReserva, diaEntrada=:diaEntrada, horaEntrada=:horaEntrada, diaSalida=:diaSalida, horaSalida=:horaSalida, vuelo=:vuelo, notes=:notes, tipo=:tipo, checkIn=:checkIn, checkOut=:checkOut, matricula=:matricula, vehiculo=:vehiculo, fechaReserva=:fechaReserva";
+                    $stmt = $conn->prepare($sql);
                     $stmt->bindParam(":idClient", $idClient, PDO::PARAM_INT);
+                    $stmt->bindParam(":idReserva", $idReserva, PDO::PARAM_INT);
                     $stmt->bindParam(":diaEntrada", $diaEntrada, PDO::PARAM_STR);
                     $stmt->bindParam(":horaEntrada", $horaEntrada, PDO::PARAM_STR);
                     $stmt->bindParam(":diaSalida", $diaSalida, PDO::PARAM_STR);
@@ -138,10 +115,12 @@ if (isset($_GET['id'])) {
                     $stmt->bindParam(":vuelo", $vuelo, PDO::PARAM_STR);
                     $stmt->bindParam(":notes", $notes, PDO::PARAM_STR);
                     $stmt->bindParam(":tipo", $tipo, PDO::PARAM_INT);
+                    $stmt->bindParam(":checkIn", $checkIn, PDO::PARAM_INT);
+                    $stmt->bindParam(":checkOut", $checkOut, PDO::PARAM_INT);
                     $stmt->bindParam(":matricula", $matricula, PDO::PARAM_STR);
                     $stmt->bindParam(":vehiculo", $vehiculo, PDO::PARAM_STR);
-                    $stmt->bindParam(":id", $id_old, PDO::PARAM_INT);
-                   
+                    $stmt->bindParam(":fechaReserva", $fechaReserva, PDO::PARAM_STR);
+
                     if ($stmt->execute()) {
                         $codi_resposta = 1;
                     } else {
@@ -149,10 +128,10 @@ if (isset($_GET['id'])) {
                     }
           
                     if ($codi_resposta == 1)  {
-                    echo '<div class="alert alert-success" role="alert"><h4 class="alert-heading"><strong>Alta reserva realitzada correctament.</h4></strong>';
+                    echo '<div class="alert alert-success" role="alert"><h4 class="alert-heading"><strong>Alta reserva realitzada correctament.</strong></h4>';
                     echo "Alta reserva amb èxit.</div>";
                     } else { // Error > bloqueja i mostra avis
-                        echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error en la transmissió de les dades</h4></strong>';
+                        echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error en la transmissió de les dades</strong></h4>';
                         echo 'Les dades no s\'han transmès correctament.</div>';
                     }
                 }
@@ -171,10 +150,10 @@ if (isset($_GET['id'])) {
                     // consulta general reserves 
                     $sql = "SELECT c.nombre, c.id
                     FROM usuaris AS c
-                    WHERE c.tipoUsuario = 3
+                    WHERE tipoUsuario = 3
                     ORDER BY c.nombre ASC";
 
-                    $pdo_statement = $pdo_conn->prepare($sql);
+                    $pdo_statement = $conn->prepare($sql);
                     $pdo_statement->execute();
                     $result = $pdo_statement->fetchAll();
                     foreach($result as $row) {
@@ -192,6 +171,7 @@ if (isset($_GET['id'])) {
                     echo "<hr>";
                     echo "<h5>Aquests camps són opcionals, els pots modificar més endavant:</h5>";
 
+
                     echo '<div class="col-md-4">';
                     echo '<label>Tipo reserva:</label>';
                     echo '<select class="form-select" name="tipo" id="tipo">';
@@ -203,63 +183,56 @@ if (isset($_GET['id'])) {
 
                     echo '<div class="col-md-4">';
                     echo '<label>Data entrada:</label>';
-                    echo '<input type="date" class="form-control" id="diaEntrada" name="diaEntrada" value="'.$dataEntrada_old.'">';
+                    echo '<input type="date" class="form-control" id="diaEntrada" name="diaEntrada">';
                     echo '</div>';
 
                     echo '<div class="col-md-4">';
                     echo '<label>Hora entrada:</label>';
-                    echo '<input type="text" class="form-control" id="horaEntrada" name="horaEntrada" placeholder="00:00" value="'.$HoraEntrada_old.'">';
+                    echo '<input type="text" class="form-control" id="horaEntrada" name="horaEntrada" placeholder="00:00">';
                     echo '</div>';
 
                     echo '<div class="col-md-4">';
                     echo '<label>Data sortida:</label>';
-                    echo '<input type="date" class="form-control" id="diaSalida" name="diaSalida" value="'.$dataSortida_old.'">';
+                    echo '<input type="date" class="form-control" id="diaSalida" name="diaSalida">';
                     echo '</div>';
 
                     echo '<div class="col-md-4">';
                     echo '<label>Hora sortida:</label>';
-                    echo '<input type="text" class="form-control" id="horaSalida" name="horaSalida" placeholder="00:00" value="'.$HoraSortida_old.'">';
+                    echo '<input type="text" class="form-control" id="horaSalida" name="horaSalida" placeholder="00:00">';
                     echo '</div>';
 
                     echo '<div class="col-md-4">';
                     echo '<label>Vol:</label>';
-                    echo '<input type="text" class="form-control" id="vuelo" name="vuelo" value="'.$vuelo_old.'">';
+                    echo '<input type="text" class="form-control" id="vuelo" name="vuelo">';
                     echo '</div>';
 
                     echo '<div class="col-md-4">';
                     echo '<label>Notes:</label>';
-                    echo '<input type="text" class="form-control" id="notes" name="notes" value="'.$notes_old.'">';
+                    echo '<input type="text" class="form-control" id="notes" name="notes">';
                     echo '</div>';
 
                     echo '<div class="col-md-4">';
                     echo '<label>Model cotxe:</label>';
-                    echo '<input type="text" class="form-control" id="vehiculo" name="vehiculo" value="'.$modelo_old.'">';
+                    echo '<input type="text" class="form-control" id="vehiculo" name="vehiculo">';
                     echo '</div>';
 
                     echo '<div class="col-md-4">';
                     echo '<label>Matrícula:</label>';
-                    echo '<input type="text" class="form-control" id="matricula" name="matricula" value="'.$matricula_old.'">';
+                    echo '<input type="text" class="form-control" id="matricula" name="matricula">';
                     echo '</div>';
         
                     echo "<div class='md-12'>";
-                    echo "<button id='modifica-reserva' name='modifica-reserva' type='submit' class='btn btn-primary'>Modifica reserva</button><a href='reserves-anuals-modificar-reserva.php'></a>
+                    echo "<button id='alta-reserva' name='alta-reserva' type='submit' class='btn btn-primary'>Alta reserva</button><a href='".APP_WEB."/clients-anuals/crear/reserva/".$idClient_old."'></a>
                     </div>";
         
                     echo "</form>";
                 } else {
-                    echo '<a href="reserves-anuals-index.php" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
+                    echo '<a href="'.APP_WEB.'/clients-anuals/" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
                 }
 
                 echo '</div>
                 </div>';
 
-        } else {
-            echo "Error: aquest ID no és vàlid";
-        }
-} else {
-    echo "Error. No has seleccionat cap reserva vàlida.";
-}
-
-require_once('inc/footer.php');
+echo "</div>";
+require_once(APP_ROOT . '/public/inc/footer.php');
 ?>
-

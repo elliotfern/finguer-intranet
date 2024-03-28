@@ -3,7 +3,7 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-
+/**/
 $url_root = $_SERVER['DOCUMENT_ROOT'];
 $url_server = $_SERVER['HTTP_HOST'];
 $base_url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
@@ -142,35 +142,58 @@ require_once(APP_ROOT . '/connection.php');
         // CARREGAR HEADER
         require_once(APP_ROOT . '/public/inc/header.php');
 
-        // 01. Inici
+        // Pagines reserves
         $route->add("/","public/1_reserves_pendents.php");
         $route->add("/inici","public/1_reserves_pendents.php");
-
         $route->add("/reserves-parking","public/2_reserves_parking.php");
         $route->add("/reserves-completades","public/3_reserves_completades.php");
 
-        $route->add("/reserva/verificar-pagament/{id}","public/soap/verificar-pagament.php");
+        // Reserves:
+            // Api verificacio pagament amb redsys
+            $route->add("/reserva/verificar-pagament/{id}","public/soap/verificar-pagament.php");
 
-        $route->add("/reserva/modificar/tipus/{id}","public/form-modificar/tipus-reserva.php");
-        $route->add("/reserva/modificar/telefon/{id}","public/form-modificar/client-telefon.php");
-        $route->add("/reserva/modificar/nom/{id}","public/form-modificar/client-nom.php");
-        $route->add("/reserva/modificar/entrada/{id}","public/form-modificar/reserva-entrada.php");
-        $route->add("/reserva/modificar/sortida/{id}","public/form-modificar/reserva-sortida.php");
-        $route->add("/reserva/modificar/vehicle/{id}","public/form-modificar/vehicle.php");
-        $route->add("/reserva/modificar/vol/{id}","public/form-modificar/vol.php");
-        $route->add("/reserva/modificar/nota/{id}","public/form-modificar/nota.php");
-        $route->add("/reserva/modificar/cercador/{id}","public/form-modificar/cercador.php");
-        $route->add("/reserva/modificar/reserva/{id}","public/form-modificar/reserva.php");
+            // Pagines modificacio elements de la reserva
+            $route->add("/reserva/modificar/tipus/{id}","public/form-modificar/tipus-reserva.php");
+            $route->add("/reserva/modificar/telefon/{id}","public/form-modificar/client-telefon.php");
+            $route->add("/reserva/modificar/nom/{id}","public/form-modificar/client-nom.php");
+            $route->add("/reserva/modificar/entrada/{id}","public/form-modificar/reserva-entrada.php");
+            $route->add("/reserva/modificar/sortida/{id}","public/form-modificar/reserva-sortida.php");
+            $route->add("/reserva/modificar/vehicle/{id}","public/form-modificar/vehicle.php");
+            $route->add("/reserva/modificar/vol/{id}","public/form-modificar/vol.php");
+            $route->add("/reserva/modificar/nota/{id}","public/form-modificar/nota.php");
+            $route->add("/reserva/modificar/cercador/{id}","public/form-modificar/cercador.php");
+            $route->add("/reserva/modificar/reserva/{id}","public/form-modificar/reserva.php");
+            $route->add("/reserva/fer/check-in/{id}","public/form-modificar/checkin.php");
+            $route->add("/reserva/fer/check-out/{id}","public/form-modificar/checkout.php");
 
-        $route->add("/reserva/eliminar/reserva/{id}","public/form-eliminar/reserva.php");
+            // Pagina eliminacio reserva
+            $route->add("/reserva/eliminar/reserva/{id}","public/form-eliminar/reserva.php");
 
-        $route->add("/reserva/info/nota/{id}","public/form-info/nota.php");
+            // Pagines informacio reserva
+            $route->add("/reserva/info/nota/{id}","public/form-info/nota.php");
+            $route->add("/reserva/info/reserva/{id}","public/form-info/reserva.php");
+            
+            // Pagines enviament emails de la reserva
+            $route->add("/reserva/email/confirmacio/{id}","public/email/reserva-enviar-email.php");
+            $route->add("/reserva/email/factura/{id}","public/email/reserva-enviar-factura-pdf.php");
 
-        $route->add("/reserva/fer/check-in/{id}","public/form-modificar/checkin.php");
-        $route->add("/reserva/fer/check-out/{id}","public/form-modificar/checkout.php");
+        // Clients anuals:
+            // Clients anual
+            $route->add("/clients-anuals","public/clients-anuals/clients.php");
 
-        $route->add("/reserva/email/confirmacio/{id}","public/email/reserva-enviar-email.php");
-        $route->add("/reserva/email/factura/{id}","public/email/reserva-enviar-factura-pdf.php");
+            $route->add("/clients-anuals/pendents","public/clients-anuals/estat-pendent.php");
+            $route->add("/clients-anuals/parking","public/clients-anuals/estat-parking.php");
+            $route->add("/clients-anuals/completades","public/clients-anuals/estat-completades.php");
+
+            $route->add("/clients-anuals/modificar/client/{idClient}","public/clients-anuals/modificar-client.php");
+            $route->add("/clients-anuals/eliminar/client/{idClient}","public/clients-anuals/eliminar-client.php");
+
+            $route->add("/clients-anuals/crear/reserva/","public/clients-anuals/crear-reserva.php");
+            $route->add("/clients-anuals/crear/reserva/{idClient}","public/clients-anuals/crear-reserva.php");
+            $route->add("/clients-anuals/crear/client","public/clients-anuals/crear-client.php");
+        
+        // Motor de recerca de reserves
+        $route->add("/cercador-reserva","public/motor-cerca/cercador.php");
 
         // Manejar todas las demás rutas (404)
         $route->notFound("public/404.php");

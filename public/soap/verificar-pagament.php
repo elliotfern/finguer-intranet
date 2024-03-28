@@ -94,6 +94,7 @@ if (is_numeric($id)) {
     echo "Error. No has seleccionat cap reserva.";
 }
 
+echo '<a href="'.APP_WEB.'/inici" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
 echo "</div>";
 
 require_once(APP_ROOT . '/public/inc/footer.php');

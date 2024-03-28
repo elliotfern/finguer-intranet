@@ -38,23 +38,23 @@
 
     <div class="row" style="margin-top:20px;margin-bottom:20px">
         <div class="col-sm">
-        <a href="cercador-reserva.php" class="btn btn-secondary menuBtn" role="button" aria-disabled="false">Cercador reserva</a>
+        <a href="<?php APP_SERVER;?>/cercador-reserva" class="btn btn-secondary menuBtn" role="button" aria-disabled="false">Cercador reserva</a>
         </div>
 
         <div class="col-sm">
-        <a href="calendari-entrades.php" class="btn btn-secondary menuBtn" role="button" aria-disabled="false">Calendari entrades</a>
+        <a href="<?php APP_SERVER;?>/calendari/entrades" class="btn btn-secondary menuBtn" role="button" aria-disabled="false">Calendari entrades</a>
         </div>
 
         <div class="col-sm">
-        <a href="calendari-sortides.php" class="btn btn-secondary menuBtn" role="button" aria-disabled="false">Calendari sortides</a>
+        <a href="<?php APP_SERVER;?>/calendari/sortides" class="btn btn-secondary menuBtn" role="button" aria-disabled="false">Calendari sortides</a>
         </div>
 
         <div class="col-sm">
-        <a href="reserves-cercadors.php" class="btn btn-secondary menuBtn" role="button" aria-disabled="false">Buscadors</a>
+        <a href="<?php APP_SERVER;?>/cercadors/" class="btn btn-secondary menuBtn" role="button" aria-disabled="false">Buscadors</a>
         </div>
 
         <div class="col-sm">
-        <a href="reserves-anuals-index.php" class="btn btn-secondary menuBtn" role="button" aria-disabled="false">Clients anuals</a>
+        <a href="<?php APP_SERVER;?>/clients-anuals" class="btn btn-secondary menuBtn" role="button" aria-disabled="false">Clients anuals</a>
         </div>
 
     </div>

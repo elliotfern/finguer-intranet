@@ -1,6 +1,8 @@
 <?php
-require_once('inc/header.php');
-require_once('inc/header-reserves-anuals.php');
+global $conn;
+require_once(APP_ROOT . '/public/inc/header-reserves-anuals.php');
+
+echo "<div class='container'>";
 ?>
 
 <h2>Estat 2: Reserves clients anuals al parking</h2>
@@ -8,7 +10,7 @@ require_once('inc/header-reserves-anuals.php');
 
 <?php
 // consulta general reserves 
-	$sql = "SELECT rc1.idReserva,
+	$pdo_statement = $conn->prepare("SELECT rc1.idReserva,
     rc1.diaSalida AS 'dataSortida',
     rc1.horaEntrada AS 'HoraEntrada',
     rc1.horaSalida AS 'HoraSortida',
@@ -28,44 +30,12 @@ require_once('inc/header-reserves-anuals.php');
     LEFT JOIN usuaris AS c ON rc1.idClient = c.id
     WHERE rc1.checkIn = 1 AND rc1.idReserva = 1 AND c.tipoUsuario = 3
     GROUP BY rc1.id
-    ORDER BY rc1.diaSalida ASC, rc1.horaSalida  ASC";
-	
-	/* Pagination Code starts */
-	$per_page_html = '';
-	$page = 1;
-	$start=0;
-	if(!empty($_POST["page"])) {
-		$page = $_POST["page"];
-		$start=($page-1) * ROW_PER_PAGE;
-	}
-	$limit=" limit " . $start . "," . ROW_PER_PAGE;
-	$pagination_statement = $pdo_conn->prepare($sql);
-	$pagination_statement->execute();
-
-	$row_count = $pagination_statement->rowCount();
-	if(!empty($row_count)){
-		$per_page_html .= "<div style='text-align:center;margin:20px 0px;'>";
-		$page_count=ceil($row_count/ROW_PER_PAGE);
-		if($page_count>1) {
-			for($i=1;$i<=$page_count;$i++){
-				if($i==$page){
-					$per_page_html .= '<input type="submit" name="page" value="' . $i . '" class="btn-page current" />';
-				} else {
-					$per_page_html .= '<input type="submit" name="page" value="' . $i . '" class="btn-page" />';
-				}
-			}
-		}
-		$per_page_html .= "</div>";
-	}
-	
-	$query = $sql.$limit;
-	$pdo_statement = $pdo_conn->prepare($query);
+    ORDER BY rc1.diaSalida ASC, rc1.horaSalida  ASC");
 	$pdo_statement->execute();
 	$result = $pdo_statement->fetchAll();
 if (!empty($result)) { 
     ?>
-    <form name='frmSearch' action='' method='post'>
-    <div class="container-lg">
+    <div class="container">
     <div class='table-responsive'>
     <table class='table table-striped'>
     <thead class="table-dark">
@@ -157,33 +127,33 @@ if (!empty($result)) {
                         echo "".$dataSortida4." // ".$horaSortida2."";
                     }
                     echo "</td>";
-                    echo "<td>".$modelo1." // <a href='canvi-matricula.php?&id=".$id."'>".$matricula1."</a></td>";
+                    echo "<td>".$modelo1." // <a href='".APP_WEB."/reserva/modificar/vehicle/".$id."'>".$matricula1."</a></td>";
             echo "<td>";
             if (empty($vuelo1)) {
-                echo "<a href='afegir-vol.php?&id=".$id."' class='btn btn-secondary btn-sm' role='button' aria-pressed='true'>Afegir vol</a>";
+                echo "<a href='".APP_WEB."/reserva/modificar/vol/".$id."'>Afegir vol</a>";
             } else {
-                echo "<a href='canvi-vol.php?&id=".$id."'>".$vuelo1."</a>";
+                echo "<a href='".APP_WEB."/reserva/modificar/vol/".$id."'>".$vuelo1."</a>";
             }
             echo "</td>";
             echo "<td>".$limpieza2."</td>";
             echo "<td>";
             if ($checkIn == 1) {
-                echo "<a href='fer-checkout.php?&id=".$id."' class='btn btn-secondary btn-sm' role='button' aria-pressed='true'>Check-Out</a>";    
+                echo "<a href='".APP_WEB."/reserva/fer/check-out/".$id."' class='btn btn-secondary btn-sm' role='button' aria-pressed='true'>Check-Out</a>";   
             }
             echo "</td>";
             echo "<td>";
             if (empty($idReserva)) {
-                echo "<a href='afegir-nota.php?&idR=".$id."' class='btn btn-info btn-sm' role='button' aria-pressed='true'>Crear notes</a>";    
+                echo "<a href='".APP_WEB."/reserva/modificar/nota/".$id."' class='btn btn-info btn-sm' role='button' aria-pressed='true'>Crear notes</a>";    
             } elseif ( !empty($idReserva) && empty($notes) ) {
-                echo "<a href='afegir-nota.php?&id=".$id."' class='btn btn-info btn-sm' role='button' aria-pressed='true'>Crear notes</a>";
+                echo "<a href='".APP_WEB."/reserva/modificar/nota/".$id."' class='btn btn-info btn-sm' role='button' aria-pressed='true'>Crear notes</a>";
             } elseif (!empty($notes) ) {
-                echo "<a href='veure-nota.php?&id=".$id."' class='btn btn-danger btn-sm' role='button' aria-pressed='true'>Veure notes</a>";
+                echo "<a href='".APP_WEB."/reserva/modificar/nota/".$id."' class='btn btn-danger btn-sm' role='button' aria-pressed='true'>Veure notes</a>";
             }
 
             echo "</td>";
             echo "<td>";
-            echo "<a href='reserves-anuals-modificar-reserva.php?&id=".$id."' class='btn btn-dark btn-sm' role='button' aria-pressed='true'>Modificar reserva</a>";
-                echo "</td>";
+            echo "<a href='".APP_WEB."/reserva/modificar/reserva/".$id."' class='btn btn-dark btn-sm' role='button' aria-pressed='true'>Modificar reserva</a>";
+            echo "</td>";
             echo "</tr>";
             }
             echo "</tbody>";
@@ -193,17 +163,12 @@ if (!empty($result)) {
 
         
         ?>
-
-    <?php echo $per_page_html; ?>
-    </form>
-
     <?php 
     $sql2 = "SELECT COUNT(r.idReserva) AS numero
         FROM reserves_parking as r
         WHERE r.checkIn = 1 AND r.idReserva = 1";
 
-        global $pdo_conn;
-            $pdo_statement = $pdo_conn->prepare($sql2);
+            $pdo_statement = $conn->prepare($sql2);
             $pdo_statement->execute();
             $result = $pdo_statement->fetchAll();
             foreach($result as $row) {
@@ -216,7 +181,6 @@ if (!empty($result)) {
         echo "En aquests moments no hi ha cap reserva de client anual al parking";
     }
     
-?>
-<?php 
-require_once('inc/footer.php');
+echo "</div>";
+require_once(APP_ROOT . '/public/inc/footer.php');
 ?>

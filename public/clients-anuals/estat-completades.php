@@ -1,6 +1,8 @@
 <?php
-require_once('inc/header.php');
-require_once('inc/header-reserves-anuals.php');
+global $conn;
+require_once(APP_ROOT . '/public/inc/header-reserves-anuals.php');
+
+echo "<div class='container'>";
 ?>
 
 <h2>Estat 3: Reserves clients anuals completades amb check-out del parking</h2>
@@ -8,7 +10,7 @@ require_once('inc/header-reserves-anuals.php');
 
 <?php
 // consulta general reserves 
-	$sql = "SELECT rc1.idReserva,
+	$pdo_statement = $conn->prepare("SELECT rc1.idReserva,
     rc1.firstName AS 'clientNom',
     rc1.lastName AS 'clientCognom',
     rc1.tel AS 'telefono',
@@ -31,44 +33,13 @@ require_once('inc/header-reserves-anuals.php');
     LEFT JOIN usuaris AS c ON rc1.idClient = c.id
     WHERE rc1.checkOut = 2 AND rc1.idReserva = 1 AND c.tipoUsuario = 3
     GROUP BY rc1.id
-    ORDER BY rc1.diaSalida DESC, rc1.horaSalida DESC";
-
-	/* Pagination Code starts */
-	$per_page_html = '';
-	$page = 1;
-	$start=0;
-	if(!empty($_POST["page"])) {
-		$page = $_POST["page"];
-		$start=($page-1) * ROW_PER_PAGE;
-	}
-	$limit=" limit " . $start . "," . ROW_PER_PAGE;
-	$pagination_statement = $pdo_conn->prepare($sql);
-	$pagination_statement->execute();
-
-	$row_count = $pagination_statement->rowCount();
-	if(!empty($row_count)){
-		$per_page_html .= "<div style='text-align:center;margin:20px 0px;'>";
-		$page_count=ceil($row_count/ROW_PER_PAGE);
-		if($page_count>1) {
-			for($i=1;$i<=$page_count;$i++){
-				if($i==$page){
-					$per_page_html .= '<input type="submit" name="page" value="' . $i . '" class="btn-page current" />';
-				} else {
-					$per_page_html .= '<input type="submit" name="page" value="' . $i . '" class="btn-page" />';
-				}
-			}
-		}
-		$per_page_html .= "</div>";
-	}
-	
-	$query = $sql.$limit;
-	$pdo_statement = $pdo_conn->prepare($query);
+    ORDER BY rc1.diaSalida DESC");
 	$pdo_statement->execute();
 	$result = $pdo_statement->fetchAll();
+    
     if(!empty($result)) { 
     ?>
-    <form name='frmSearch' action='' method='post'>
-    <div class="container-lg">
+    <div class="container">
     <div class='table-responsive'>
     <table class='table table-striped'>
     <thead class="table-dark">
@@ -87,7 +58,6 @@ require_once('inc/header-reserves-anuals.php');
                     <tbody>
 
         <?php
-        
             foreach($result as $row) {
                 $matricula1 = $row['matricula'];
                 $modelo1 = $row['modelo'];
@@ -96,14 +66,22 @@ require_once('inc/header-reserves-anuals.php');
                 $horaEntrada2 = $row['HoraEntrada'];
                 $horaSortida2 = $row['HoraSortida'];
 
-                $dataEntrada = $row['dataEntrada'];
-                $anyEntrada = date('Y', strtotime( $dataEntrada));
-                $dataEntrada4 = date("d-m-Y", strtotime($dataEntrada));
-            
-                $dataSortida = $row['dataSortida'];
-                $anySortida = date('Y', strtotime( $dataSortida));
-                $dataSortida4 = date("d-m-Y", strtotime($dataSortida));
-        
+                if (isset($row['dataEntrada'])) {
+                    $dataEntrada = $row['dataEntrada'];
+                    $anyEntrada = date('Y', strtotime( $dataEntrada));
+                    $dataEntrada4 = date("d-m-Y", strtotime($dataEntrada));
+                } else {
+                    $dataEntrada4 = "";
+                }
+
+                if (isset($row['dataSortida'])) {               
+                    $dataSortida = $row['dataSortida'];
+                    $anySortida = date('Y', strtotime( $dataSortida));
+                    $dataSortida4 = date("d-m-Y", strtotime($dataSortida)); 
+                } else {
+                    $dataSortida4 = "";
+                }
+                
                 $tipo = $row['tipo'];
                 if ($tipo == 1) {
                     $tipoReserva2 = "Finguer Class";
@@ -159,36 +137,27 @@ require_once('inc/header-reserves-anuals.php');
                         echo "".$dataSortida4." // ".$horaSortida2."";
                     }
                     echo "</td>";
-                    echo "<td>".$modelo1." // <a href='canvi-matricula.php?&id=".$id."'>".$matricula1."</a></td>";
+                    echo "<td>".$matricula1."</td>";
             echo "<td>";
             if (empty($vuelo1)) {
                 echo "<a href='afegir-vol.php?&id=".$id."' class='btn btn-secondary btn-sm' role='button' aria-pressed='true'>Afegir vol</a>";
             } else {
-                echo "<a href='canvi-vol.php?&id=".$id."'>".$vuelo1."</a>";
+                echo $vuelo1;
             }
             echo "</td>";
             echo "<td>".$limpieza2."</td>";
-            echo "<td>Reserva completada (<a href='reserves-anuals-estat-modificar.php?&id=".$id."'>modificar</a>)</td>";
+            echo "<td>Reserva completada</td>";
             echo "</tr>";
             }
             echo "</tbody>";
             echo "</table>";
-            echo "</div>";
-      
+            echo "</div>";	
 
-	
-	?>
-
-<?php echo $per_page_html; ?>
-</form>
-
-<?php 
 $sql2 = "SELECT COUNT(r.idReserva) AS numero
     FROM reserves_parking as r
     WHERE r.checkOut = 2 AND r.idReserva = 1";
 
-    global $pdo_conn;
-        $pdo_statement = $pdo_conn->prepare($sql2);
+        $pdo_statement = $conn->prepare($sql2);
         $pdo_statement->execute();
         $result = $pdo_statement->fetchAll();
         foreach($result as $row) {
@@ -201,7 +170,6 @@ $sql2 = "SELECT COUNT(r.idReserva) AS numero
     echo "En aquests moments no hi ha cap reserva de client anual completada";
 }
 
-?>
-<?php 
-require_once('inc/footer.php');
+echo "</div>";
+require_once(APP_ROOT . '/public/inc/footer.php');
 ?>

@@ -1,11 +1,14 @@
 <?php
-require_once('inc/header.php');
-require_once('inc/header-reserves-anuals.php');
+$idClient = $params['idClient'];
 
+global $conn;
+require_once(APP_ROOT . '/public/inc/header-reserves-anuals.php');
+
+echo "<div class='container'>";
 echo "<h3>Modificar dades client Abonament anual</h3>";
 
-if (isset($_GET['idClient'])) {
-    $idClient_old = filter_input(INPUT_GET, 'idClient', FILTER_SANITIZE_NUMBER_INT);
+if (is_numeric($idClient)) {
+    $idClient_old = intval($idClient);
     
     if ( filter_var($idClient_old, FILTER_VALIDATE_INT) ) {
         $codi_resposta = 2;
@@ -15,7 +18,7 @@ if (isset($_GET['idClient'])) {
         FROM usuaris AS c
         WHERE c.id=$idClient_old";
 
-        $pdo_statement = $pdo_conn->prepare($sql);
+        $pdo_statement = $conn->prepare($sql);
         $pdo_statement->execute();
         $result = $pdo_statement->fetchAll();
         foreach($result as $row) {
@@ -29,7 +32,6 @@ if (isset($_GET['idClient'])) {
 function data_input($data) {
     $data = trim($data);
     $data = stripslashes($data);
-    $data = htmlspecialchars($data);
     return $data;
 }
 $codi_resposta = 2;
@@ -40,30 +42,29 @@ $codi_resposta = 2;
                 if (empty($_POST["nombre"])) {
                     $hasError = true;
                 } else {
-                    $nombre = data_input($_POST["nombre"], ENT_NOQUOTES);
+                    $nombre = data_input($_POST["nombre"]);
                 }
                 
 
                 if (empty($_POST["telefono"])) {
-                    $telefono = data_input($_POST["telefono"], ENT_NOQUOTES);
+                    $telefono = data_input($_POST["telefono"]);
                 } else {
-                    $telefono = data_input($_POST["telefono"], ENT_NOQUOTES);
+                    $telefono = data_input($_POST["telefono"]);
                 }
 
                 if (empty($_POST["anualitat"])) {
                     $anualitat = NULL;
                 } else {
-                    $anualitat = data_input($_POST["anualitat"], ENT_NOQUOTES);
+                    $anualitat = data_input($_POST["anualitat"]);
                 }
 
                // Si no hi ha cap error, envia el formulari
                 if (!isset($hasError)) {
                     $emailSent = true;
 
-                    global $pdo_conn;
                     $sql = "UPDATE usuaris SET nombre=:nombre, telefono=:telefono, anualitat=:anualitat
                     WHERE id=:id";
-                    $stmt = $pdo_conn->prepare($sql);
+                    $stmt = $conn->prepare($sql);
                     $stmt->bindParam(":nombre", $nombre, PDO::PARAM_STR);
                     $stmt->bindParam(":telefono", $telefono, PDO::PARAM_STR);
                     $stmt->bindParam(":anualitat", $anualitat, PDO::PARAM_STR);
@@ -76,15 +77,15 @@ $codi_resposta = 2;
                     }
           
                 } else { // Error > bloqueja i mostra avis
-                    echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error!</h4></strong>';
+                    echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error!</strong></h4>';
                     echo 'Controla que totes les dades siguin correctes.</div>';
                 } 
 
                     if ($codi_resposta == 1)  {
-                    echo '<div class="alert alert-success" role="alert"><h4 class="alert-heading"><strong>Alta realizada correctament.</h4></strong>';
+                    echo '<div class="alert alert-success" role="alert"><h4 class="alert-heading"><strong>Alta realizada correctament.</strong></h4>';
                     echo "Alta client anual amb èxit.</div>";
                     } else { // Error > bloqueja i mostra avis
-                        echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error en la transmissió de les dades</h4></strong>';
+                        echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error en la transmissió de les dades</strong></h4>';
                         echo 'Les dades no s\'han transmès correctament.</div>';
                     }
                 }
@@ -108,12 +109,12 @@ $codi_resposta = 2;
                     echo '</div>';
         
                     echo "<div class='md-12'>";
-                    echo "<button id='update-client' name='update-client' type='submit' class='btn btn-primary'>Modifica client</button><a href='reserves-anuals-modificar-client.php'></a>
+                    echo "<button id='update-client' name='update-client' type='submit' class='btn btn-primary'>Modifica client</button><a href='".APP_WEB."/clients-anuals/modificar/client/".$idClient_old."'></a>
                     </div>";
         
                     echo "</form>";
                 } else {
-                    echo '<a href="reserves-anuals-index.php" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
+                    echo '<a href="'.APP_WEB.'/clients-anuals/" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
                 }
 
                 
@@ -122,12 +123,11 @@ $codi_resposta = 2;
             }
 
 } else {
-   echo "Error. No has seleccionat cap vehicle.";
+   echo "Error. No has seleccionat cap client.";
 }
 
-echo '</div>
- </div>';
+echo '</div>';
+echo "</div>";
 
-require_once('inc/footer.php');
+require_once(APP_ROOT . '/public/inc/footer.php');
 ?>
-

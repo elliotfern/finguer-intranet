@@ -1,20 +1,18 @@
 <?php
-require_once('inc/header.php');
+global $conn;
+require_once(APP_ROOT . '/public/inc/header-reserves-anuals.php');
 
-require_once('inc/header-reserves-anuals.php');
-
+echo "<div class='container'>";
 echo "<h3>Alta nou client Abonament anual</h3>";
 
 function data_input($data) {
     $data = trim($data);
     $data = stripslashes($data);
-    $data = htmlspecialchars($data);
     return $data;
 }
 $codi_resposta = 2;
 	
               if (isset($_POST["alta-client"])) {
-                global $pdo_conn;
                   
                 if (empty($_POST["nombre"])) {
                     $hasError = true;
@@ -41,13 +39,12 @@ $codi_resposta = 2;
                     $emailSent = true;
           
                 } else { // Error > bloqueja i mostra avis
-                    echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error!</h4></strong>';
+                    echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error!</strong></h4>';
                     echo 'Controla que totes les dades siguin correctes.</div>';
                 } 
 
-                    global $pdo_conn;
                     $sql = "INSERT INTO usuaris SET nombre=:nombre, telefono=:telefono, anualitat=:anualitat, tipoUsuario=:tipoUsuario";
-                    $stmt = $pdo_conn->prepare($sql);
+                    $stmt = $conn->prepare($sql);
                     $stmt->bindParam(":nombre", $nombre, PDO::PARAM_STR);
                     $stmt->bindParam(":telefono", $telefono, PDO::PARAM_STR);
                     $stmt->bindParam(":anualitat", $anualitat, PDO::PARAM_STR);
@@ -60,10 +57,10 @@ $codi_resposta = 2;
                     }
           
                     if ($codi_resposta == 1)  {
-                    echo '<div class="alert alert-success" role="alert"><h4 class="alert-heading"><strong>Alta realizada correctament.</h4></strong>';
+                    echo '<div class="alert alert-success" role="alert"><h4 class="alert-heading"><strong>Alta realizada correctament.</strong></h4>';
                     echo "Alta client anual amb èxit.</div>";
                     } else { // Error > bloqueja i mostra avis
-                        echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error en la transmissió de les dades</h4></strong>';
+                        echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error en la transmissió de les dades</strong></h4>';
                         echo 'Les dades no s\'han transmès correctament.</div>';
                     }
                 }
@@ -87,17 +84,17 @@ $codi_resposta = 2;
                     echo '</div>';
         
                     echo "<div class='md-12'>";
-                    echo "<button id='alta-client' name='alta-client' type='submit' class='btn btn-primary'>Alta client</button><a href='reserves-anuals-crear-client.php'></a>
+                    echo "<button id='alta-client' name='alta-client' type='submit' class='btn btn-primary'>Alta client</button><a href='".APP_WEB."/clients-anuals/crear/client/'></a>
                     </div>";
         
                     echo "</form>";
                 } else {
-                    echo '<a href="reserves-anuals-index.php" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
+                    echo '<a href="'.APP_WEB.'/clients-anuals/" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
                 }
 
                 echo '</div>
                 </div>';
 
-require_once('inc/footer.php');
+echo "</div>";
+require_once(APP_ROOT . '/public/inc/footer.php');
 ?>
-

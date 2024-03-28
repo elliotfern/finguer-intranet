@@ -1,11 +1,14 @@
 <?php
-require_once('inc/header.php');
-require_once('inc/header-reserves-anuals.php');
+$idClient = $params['idClient'];
 
+global $conn;
+require_once(APP_ROOT . '/public/inc/header-reserves-anuals.php');
+
+echo "<div class='container'>";
 echo "<h3>Modificar dades client Abonament anual</h3>";
 
-if (isset($_GET['idClient'])) {
-    $idClient_old = filter_input(INPUT_GET, 'idClient', FILTER_SANITIZE_NUMBER_INT);
+if (is_numeric($idClient)) {
+    $idClient_old = intval($idClient);
     
     if ( filter_var($idClient_old, FILTER_VALIDATE_INT) ) {
         $codi_resposta = 1;
@@ -15,7 +18,7 @@ if (isset($_GET['idClient'])) {
         FROM usuaris AS c
         WHERE c.id=$idClient_old";
 
-        $pdo_statement = $pdo_conn->prepare($sql);
+        $pdo_statement = $conn->prepare($sql);
         $pdo_statement->execute();
         $result = $pdo_statement->fetchAll();
         foreach($result as $row) {
@@ -34,11 +37,9 @@ if (isset($_GET['idClient'])) {
 
         if (isset($_POST["remove-client"])) {
                             $emailSent = true;
-
-                            global $pdo_conn;
                             $sql = "DELETE FROM usuaris
                             WHERE id=:id";
-                            $stmt = $pdo_conn->prepare($sql);
+                            $stmt = $conn->prepare($sql);
                             $stmt->bindParam(":id", $idClient_old, PDO::PARAM_INT);
 
             if ($stmt->execute()) {
@@ -49,10 +50,10 @@ if (isset($_GET['idClient'])) {
         }
                         
             if ($codi_resposta == 3)  {
-                            echo '<div class="alert alert-success" role="alert"><h4 class="alert-heading"><strong>Eliminació realizada correctament.</h4></strong>';
+                            echo '<div class="alert alert-success" role="alert"><h4 class="alert-heading"><strong>Eliminació realizada correctament.</strong></h4>';
                             echo "Eliminació del client anual amb èxit.</div>";
             } elseif ($codi_resposta == 2)  {
-                                echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error en la transmissió de les dades</h4></strong>';
+                                echo '<div class="alert alert-danger" role="alert"><h4 class="alert-heading"><strong>Error en la transmissió de les dades</strong></h4>';
                                 echo 'Les dades no s\'han transmès correctament.</div>';
             }
                     
@@ -64,13 +65,13 @@ if (isset($_GET['idClient'])) {
                             echo '<form method="post" action="">';
 
                             echo "<div class='md-12'>";
-                            echo "<button id='remove-client' name='remove-client' type='submit' class='btn btn-primary'>Eliminar client</button><a href='reserves-anuals-eliminar-client.php'></a>
+                            echo "<button id='remove-client' name='remove-client' type='submit' class='btn btn-primary'>Eliminar client</button><a href='".APP_WEB."/clients-anuals/eliminar/client/".$idClient_old."'></a>
                             </div>";
 
                             echo "</form>";
                 
             } else {
-                echo '<a href="reserves-anuals-index.php" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
+                echo '<a href="'.APP_WEB.'/clients-anuals/" class="btn btn-dark menuBtn" role="button" aria-disabled="false">Tornar</a>';
             }
         
                         
@@ -80,9 +81,9 @@ if (isset($_GET['idClient'])) {
         
 }
 
-echo '</div>
- </div>';
+echo '</div>';
 
-require_once('inc/footer.php');
+echo "</div>";
+
+require_once(APP_ROOT . '/public/inc/footer.php');
 ?>
-
