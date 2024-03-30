@@ -21,8 +21,8 @@
                 <th>Cercadors</th>
                 <th>Email confirmació</th>
                 <th>Factura</th>
-                <th></th>
-                <th></th>
+                <th>Modificar</th>
+                <th>Eliminar</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -183,7 +183,7 @@ function fetch_data(){
                 } else if (data[i].idReserva && !data[i].notes) {
                     html += '<a href="' + window.location.origin + '/reserva/modificar/nota/' + data[i].id + '" class="btn btn-info btn-sm" role="button" aria-pressed="true">Crear</a>';
                 } else if (data[i].notes) {
-                    html += '<a href="' + window.location.origin + '/reserva/info/nota/' + data[i].id + '" class="btn btn-danger btn-sm" role="button" aria-pressed="true">Veure</a>';
+                    html += '<a href="' + window.location.origin + '/reserva/info/nota/' + data[i].id + '" class="btn btn-danger btn-sm" role="button" aria-pressed="true">Veure</a>'; 
                 }
                 html += '</td>';
 
@@ -203,16 +203,16 @@ function fetch_data(){
                 html += '</td>';
 
                 // 14 - Email confirmacio
-                html += '<td><a href="' + window.location.origin + '/reserva/email/confirmacio/' + data[i].id + '" class="btn btn-primary btn-sm" role="button" aria-pressed="true">Enviar email</a></td>';
+                html += '<td><a href="' + window.location.origin + '/reserva/email/confirmacio/' + data[i].id + '" class="btn btn-success btn-sm" role="button" aria-pressed="true"><i class="bi bi-envelope"></i></i></a></td>';
                 
                 // 15 - Enviar factura pdf
-                html += '<td><a href="' + window.location.origin + '/reserva/email/factura/' + data[i].id + '" class="btn btn-primary btn-sm" role="button" aria-pressed="true">PDF</a></td>';
+                html += '<td><a href="' + window.location.origin + '/reserva/email/factura/' + data[i].id + '" class="btn btn-primary btn-sm" role="button" aria-pressed="true"><i class="bi bi-file-earmark-pdf"></a></td>';
 
                 // 16 - Modificar reserva
-                html += '<td><a href="' + window.location.origin + '/reserva/modificar/reserva/' + data[i].id + '" class="btn btn-warning btn-sm" role="button" aria-pressed="true">Modificar</a></td>';
+                html += '<td><a href="' + window.location.origin + '/reserva/modificar/reserva/' + data[i].id + '" class="btn btn-warning btn-sm" role="button" aria-pressed="true"><i class="bi bi-pencil-square"></i></a></td>';
 
                 // 17 - Eliminar reserva
-                html += '<td><a href="' + window.location.origin + '/reserva/eliminar/reserva/' + data[i].id + '" class="btn btn-danger btn-sm" role="button" aria-pressed="true">Eliminar</a></td>';
+                html += '<td><a href="' + window.location.origin + '/reserva/eliminar/reserva/' + data[i].id + '" class="btn btn-danger btn-sm" role="button" aria-pressed="true"><i class="bi bi-trash"></i></a></td>';
 
                 html += '</tr>';
             }
