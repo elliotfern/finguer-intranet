@@ -31,8 +31,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'pendents' ) {
     FROM reserves_parking AS rc1
     left join reservas_buscadores AS b ON rc1.buscadores = b.id
     left JOIN usuaris AS u ON rc1.idClient = u.id
-    WHERE rc1.checkIn = 5 OR rc1.checkIn = NULL
-    GROUP BY rc1.idReserva
+    WHERE rc1.checkIn = 5
     ORDER BY rc1.diaEntrada ASC, rc1.horaEntrada ASC");
     $stmt->execute();
         if($stmt->rowCount() === 0) echo ('No rows');
