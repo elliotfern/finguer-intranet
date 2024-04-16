@@ -174,9 +174,9 @@ if (is_numeric($id)) {
                         <th>
                         <strong>BCN PARKING S.L</strong><br>
                         CIF: B65548919<br>
-                        Rambla de Marisol 3<br>
-                        Barcelona, (Barcelona)<br>
-                        Código postal: 08860<br>
+                        Carrer de l\'Alt Camp 9<br>
+                        Sant Boi de Llobregat (Barcelona)<br>
+                        Código postal: 08830<br>
                         ESPAÑA
                         </th>
                       </tr>
